@@ -192,6 +192,58 @@
 			\node at (77,-239)
 				{Öffentlich; Bibliothek der \EmSchoolName};
 		}
+		\IncludeSchoolTemplate{3}{
+			\node at (76,-28)
+				{Informatics};
+			\node at (77,-63)
+				{\EmRealAuthorName};
+			\node at (77,-80)
+				{2019/20};
+			\node at (77,-92)
+				{Easy Mark One};
+			\node at (77,-109)
+				{\EmPartner};
+			\node at (77,-125) [text width=305,align=justify] {
+				\fontsize{12pt}{12pt}
+				\selectfont
+				\par
+				The project aimed to create a tool for partial automation of the grading process of programming assignments or homework in the programming language Java (subproject \emph{Automark}), as well as a web platform for teachers and students to share information on assignments and grades (subproject \emph{EasyMark}).
+				\vskip10pt
+				\par
+				It was a requirement that programs be written in Java.
+			};
+			\node at (77,-173) [text width=300,align=justify] {
+				\fontsize{12pt}{12pt}
+				\selectfont
+				\par
+				Automark was realized as one self-contained Java program which can be controlled via the command line as well as over a GUI. Several libraries have been used to provide a number of different functionalities.
+				\vskip10pt
+				\par
+				EasyMark was developed on top of the \emph{Javalin} web framework. A flat JSON file behind a read/write lock serves as a database. Spring Security (the standalone variant) provides cryptographic functionality.
+			};
+			\node at (77, -225) [text width=300,align=justify] {
+				\fontsize{12pt}{12pt}
+				\selectfont
+				\par
+				Automark: After basic tasks of the grading process, auxiliary functions like rollback/mark-resolved were implemented. A GUI was developed to ease the onboarding experience. The requirements were extended by additional functionality like the automatic sending of result email and the configuration wizard.
+				\vskip10pt
+				\par
+				EasyMark: Initially, the database and the database system was implemented. Functionality was first implemented in the abstract, then the actual business-logic. Lastly the security of the server was revamped and a program to automatically configure a host was written.
+			};
+		}
+		\IncludeSchoolTemplate{4}{
+			\node at (76,-28)
+				{Informatics};
+			\node at (77,-64){
+				\includegraphics[width=310pt,trim=0pt 0pt 1110pt 0pt,clip]{automark_dashboard_w_details_expanded.png}
+			};
+			\node at (77,-166) [text width=305,align=center]
+				{\emph{Screenshot of Automark's GUI (cropped). The panel on the left-hand side displays an overview over all tasks in the process (\emph{stages}). In the middle there's a table showing an overview as well as detailed information about students' submissions and any problems with them. Personally identifiable information has been blurred.}};
+			\node at (77,-220)
+				{--};
+			\node at (77,-240)
+				{Public; Library of the \EmSchoolName};
+		}
 	}{}
 	\clearpage
 	\pagenumbering{arabic}
