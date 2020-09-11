@@ -1,0 +1,146 @@
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{fontspec}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{lipsum}
+\usepackage[skip=10pt]{parskip}
+
+\ifdefined\EasyMarkPrivateBuild
+	\input{private.tex}
+	\newcommand{\IfPrivateBuild}[2]{#1}
+\else
+	\newcommand{\IfPrivateBuild}[2]{#2}
+\fi
+
+\setcounter{secnumdepth}{3}
+\addtolength{\textwidth}{-1cm}
+\addtolength{\oddsidemargin}{1cm}
+\addtolength{\evensidemargin}{1cm}
+
+% Calibri or sans-serif as default font
+\defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+\IfFontExistsTF{Calibre}{
+	\setmainfont{Calibre}
+}{
+	\renewcommand{\familydefault}{\sfdefault}
+}
+
+% TOC horizontal spacing
+\cftsetindents{chapter}{0cm}{1cm}
+\cftsetindents{section}{1cm}{1cm}
+\cftsetindents{subsection}{2cm}{1.2cm}
+
+% TOC vertical spacing
+\renewcommand{\cftchapfont}{
+	\bfseries
+	\fontsize{13pt}{13pt}
+	\selectfont
+	\vspace{6pt}
+}
+\cftbeforechapskip12pt
+\renewcommand{\cftsecfont}{
+	\fontsize{11pt}{11pt}
+	\selectfont
+	\vspace{6pt}
+}
+\cftbeforesecskip6pt
+\renewcommand{\cftsubsecfont}{
+	\fontsize{10pt}{10pt}
+	\selectfont
+	\vspace{3pt}
+}
+\cftbeforesubsecskip6pt
+
+% TOC title
+\renewcommand\cfttoctitlefont{
+	\hfill
+	\fontsize{16pt}{16pt}
+	\selectfont
+	\bfseries
+}
+\cftbeforetoctitleskip6pt
+\cftaftertoctitleskip12pt
+
+% Title format for chapter, section, sub- and subsubsection
+% See https://tex.stackexchange.com/questions/511981/titlesec-vertical-align-chapter-and-section
+% The -5pt is just pixel pushing bc I couldn't figure out why my chapter/section/subsection/subsubsection headings are slightly indented
+\titleformat{\chapter}[hang]{
+	\normalfont
+	\bfseries
+	\filright
+	\fontsize{16pt}{16pt}
+	\selectfont
+}{
+	\makebox[1.7cm][l]{\thechapter}
+}{0em}{}
+\titlespacing{\chapter}{-5pt}{18pt}{12pt}
+
+\titleformat{\section}[hang]{
+	\normalfont
+	\bfseries
+	\filright
+	\fontsize{14pt}{14pt}
+	\selectfont
+}{
+	\makebox[1.7cm][l]{\thesection}
+}{0em}{}
+\titlespacing{\section}{-5pt}{18pt}{12pt}
+
+\titleformat{\subsection}[hang]{
+	\normalfont
+	\bfseries
+	\filright
+	\fontsize{12pt}{12pt}
+	\selectfont
+}{
+	\makebox[1.7cm][l]{\thesubsection}
+}{0em}{}
+\titlespacing{\subsection}{-5pt}{18pt}{12pt}
+
+\titleformat{\subsubsection}[hang]{
+	\normalfont
+	\bfseries
+	\filright
+	\fontsize{11pt}{11pt}
+	\selectfont
+}{
+	\makebox[1.7cm][l]{\thesubsubsection}
+}{0em}{}
+\titlespacing{\subsubsection}{-5pt}{12pt}{12pt}
+
+
+\title{Easy Mark One}
+\author{\IfPrivateBuild{\EmRealAuthorName}{T0astBread}}
+
+\begin{document}
+	\pagenumbering{gobble}
+	\maketitle
+	\tableofcontents
+	\newpage
+	\pagenumbering{arabic}
+	\chapter{Data Chapter 1}
+	\section{Data}
+	Text text text text text text text text text text text text text text text text text text text text text text text text text.
+	As you can see, the header is aligned with the text. I am trying to get the header aligned with the section number while keeping the text aligned with the section title.
+	\subsection{Dataset}
+	\lipsum
+	\subsection{Data Preparation}
+	fdfds
+	\subsubsection{SQLite}
+	fdjksfjdls
+	\subsubsection{Data Processing}
+	fdjksfjdls
+	\subsection{Databases}
+	fkdjsfdls
+	\subsection{Configuration Data}
+	\chapter{More Data}
+	\section{Data}
+	Yo what's up
+\end{document}
