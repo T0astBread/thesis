@@ -11,6 +11,7 @@
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{lipsum}
 \usepackage[skip=10pt]{parskip}
+\usepackage{mwe,tikz}
 
 \ifdefined\EasyMarkPrivateBuild
 	\input{private.tex}
@@ -115,6 +116,20 @@
 }{0em}{}
 \titlespacing{\subsubsection}{-5pt}{12pt}{12pt}
 
+\newcommand{\IncludeSchoolTemplate}[2]{
+	\vspace*{-7em}
+	\makebox[\textwidth]{
+		\begin{tikzpicture}[
+			every node/.style={anchor=north west,inner sep=0pt},
+			x=1mm, y=1mm]
+			\node (templatepage) at (0,0)
+				{\includegraphics[width=\paperwidth,page=#1]{summary.pdf}};
+			#2
+		\end{tikzpicture}
+	}
+	\newpage
+}
+
 
 \title{Easy Mark One}
 \author{\IfPrivateBuild{\EmRealAuthorName}{T0astBread}}
@@ -124,6 +139,57 @@
 	\maketitle
 	\tableofcontents
 	\newpage
+	\IfPrivateBuild{
+		\IncludeSchoolTemplate{1}{
+			\node at (77,-63)
+				{\EmRealAuthorName};
+			\node at (77,-80)
+				{2019/20};
+			\node at (77,-92)
+				{Easy Mark One};
+			\node at (77,-109)
+				{\EmPartner};
+			\node at (77,-127) [text width=305,align=justify] {
+				\fontsize{12pt}{12pt}
+				\selectfont
+				\par
+				Ziel des Projekts war die Entwicklung eines Tools zur Teilautomatisierung des Bewertungsprozesses für Programmier(haus)aufgaben in der Programmiersprache Java (Teilprojekt \emph{Automark}), sowie einer Web-Plattform für Lehrer und Schüler, um Informationen zu Aufgaben und Bewertungen zu teilen (Teilprojekt \emph{EasyMark}).
+				\vskip10pt
+				\par
+				Alle Programme sollten in Java realisiert werden.
+			};
+			\node at (77,-174) [text width=300,align=justify] {
+				\fontsize{12pt}{12pt}
+				\selectfont
+				\par
+				Automark wurde als ein zusammenhängendes Java-Programm umgesetzt, das über die Kommandozeile sowie über eine GUI gesteuert werden kann. Diverse Libraries wurden für die zahlreichen Funktionen verwendet.
+				\vskip10pt
+				\par
+				EasyMark wurde auf Basis des \emph{Javalin} Web-Frameworks entwickelt. Als Datenbank fungiert eine flache JSON-Datei mit Read/Write Lock. Für kryptographische Funktionen wurde Spring Security (als Standalone-Variante) verwendet.
+			};
+			\node at (77, -222) [text width=300,align=justify] {
+				\fontsize{12pt}{12pt}
+				\selectfont
+				\par
+				Automark: Die Teilaufgaben im Bewertungsprozess wurden zuerst implementiert, danach Nebenfunktionen wie Rollback/mark-resolved. Die GUI wurde entwickelt, um den Einstieg ins Programm zu erleichtern. Ebenfalls noch Zusatzfunktionen wie das automatische Versenden von Ergebnis-Emails und der Konfigurations-Wizard.
+				\vskip10pt
+				\par
+				EasyMark: Zuerst wurden das Datenmodell und das Datenbanksystem entwickelt. Die Funktionalität würde zuerst abstrakt implementiert, dann die Business-Logic. Zuletzt wurde die Sicherheit des Servers überarbeitet und ein Programm zur Konfiguration eines Hosts geschrieben.
+			};
+		}
+		\IncludeSchoolTemplate{2}{
+			\node at (77,-69){
+				\includegraphics[width=310pt,trim=0pt 0pt 1110pt 0pt,clip]{automark_dashboard_w_details_expanded.png}
+			};
+			\node at (77,-171) [text width=305,align=center]
+				{\emph{Screenshot der Automark-GUI (Ausschnitt). Links befindet sich eine Übersicht über alle Teilaufgaben im Prozess (\emph{Stages}). In der Mitte eine Tablle mit einer Übersicht sowie Details zu Schülerabgaben und deren Mängel. Persönlich identifizierbare Informationen sind unkenntlich gemacht.}};
+			\node at (77,-220)
+				{--};
+			\node at (77,-239)
+				{Öffentlich; Bibliothek der \EmSchoolName};
+		}
+	}{}
+	\clearpage
 	\pagenumbering{arabic}
 	\chapter{Data Chapter 1}
 	\section{Data}
