@@ -146,8 +146,6 @@
 \begin{document}
 	\pagenumbering{gobble}
 	\maketitle
-	\tableofcontents
-	\newpage
 	\IfPrivateBuild{
 		\chapter*{Erklärung gemäß Prüfungsordnung}
 		„Ich erkläre an Eides statt, dass ich die vorliegende Diplomarbeit selbstständig und ohne fremde Hilfe verfasst, andere als die angegebenen Quellen und Hilfsmittel nicht benutzt und alle den benutzten Quellen wörtlich oder sinngemäß entnommenen Stellen als solche kenntlich gemacht habe.“
@@ -262,6 +260,8 @@
 		}
 	}{}
 	\clearpage
+	\tableofcontents
+	\newpage
 	\pagenumbering{arabic}
 	\chapter{Data Chapter 1}
 	\section{Data}
