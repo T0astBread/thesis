@@ -12,6 +12,8 @@
 \usepackage{lipsum}
 \usepackage[skip=10pt]{parskip}
 \usepackage{mwe,tikz}
+\usepackage{tabto}
+\usepackage{dashrule}
 
 \ifdefined\EasyMarkPrivateBuild
 	\input{private.tex}
@@ -130,6 +132,13 @@
 	\newpage
 }
 
+\newcommand{\SignatureLine}[1]{
+	\vskip15pt
+	\tabto{9cm}#1
+	\vskip10pt
+	\tabto{9cm}\hdashrule[0pt][x]{\fill}{.5pt}{.75mm}
+}
+
 
 \title{Easy Mark One}
 \author{\IfPrivateBuild{\EmRealAuthorName}{T0astBread}}
@@ -140,6 +149,13 @@
 	\tableofcontents
 	\newpage
 	\IfPrivateBuild{
+		\chapter*{Erklärung gemäß Prüfungsordnung}
+		„Ich erkläre an Eides statt, dass ich die vorliegende Diplomarbeit selbstständig und ohne fremde Hilfe verfasst, andere als die angegebenen Quellen und Hilfsmittel nicht benutzt und alle den benutzten Quellen wörtlich oder sinngemäß entnommenen Stellen als solche kenntlich gemacht habe.“
+
+		\EmPhysicalLocation, \today\tabto{9cm}{Verfasser*innen:}
+
+		\SignatureLine{\EmRealAuthorName}
+		\newpage
 		\IncludeSchoolTemplate{1}{
 			\node at (77,-28)
 				{Informatik};
