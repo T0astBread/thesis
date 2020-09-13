@@ -35,6 +35,7 @@
 \addtolength{\evensidemargin}{1cm}
 
 \lstset{language=sh,basicstyle=\ttfamily}
+\lstset{language=java,basicstyle=\ttfamily}
 
 % Calibri or sans-serif as default font
 \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
@@ -367,17 +368,17 @@
 	\subsubsection{GSON}
 	GSON is a Java library by Google for simple serialization and deserialization of Java objects to and from JSON objects and arrays\parencite{gsongithub}. It was chosen since it operates using Java's reflection feature which spares the developer from having to write explicit parsing code.
 
-	\subsubsection{JSoup} \label{sec:jsoup}
+	\subsubsection{JSoup} \label{subsubsec:jsoup}
 	\BlockCite{jsoup is a Java library for working with real-world HTML. It provides a very convenient API for fetching URLs and extracting and manipulating data, using the best of HTML5 DOM methods and CSS selectors.}{jsoupwebsite}
 
 	JSoup is used for automatically obtaining data from Moodle. Since the Moodle version Automark is built for does not make heavy use of client-side scripting (which JSoup does not support), JSoup was the most stable choice.
 
 	Alternatives to JSoup would typically use a fully-fledged browser such as Google Chrome or Firefox and automate website interactions using APIs (application programming interfaces) provided by the browser which then perfoms interactions as if a human user had done it. Aside from reduced speed, the main drawback with this approach is that library versions quickly become outdated due to the underlying browser version becoming outdated. In the case of some libraries, vendors will not provide downloads for old browser versions anymore leading to breakage of new installations.
 
-	\subsubsection{Zip4j}
+	\subsubsection{Zip4j} \label{subsubsec:zip4j}
 	Zip4j provides ZIP packing and extraction functionality.\parencite{zip4jwebsite} It is used to unpack submission files downloaded from Moodle or provided by the operator.
 
-	\subsubsection{JUnit 5}
+	\subsubsection{JUnit 5} \label{subsubsec:junit5}
 	JUnit 5 is a unit testing framework for JVM languages.\parencite{junit5website} In Automark it is used for running unit tests provided by the operator against students' submissions. JUnit 5 provides a simple interface for automating test execution via the "junit-platform-launcher" package\parencite{junitplatformlauncherdocs}.
 
 	\subsubsection{Simple Java Mail}
@@ -385,6 +386,14 @@
 
 	\subsubsection{Spark}
 	Spark is a web server framework for JVM languages (with special focus on Java and Kotlin)\parencite{sparkwebsite}. It is used to provide the in-Browser GUI locally and with security restrictions. %TODO: refenrence GUI security restrictions chapter
+
+	\pagebreak
+	\subsection{JPlag} \label{subsec:jplag}
+	\BlockCite{JPlag is a system that finds similarities among multiple sets of source code files. This way it can detect software plagiarism. JPlag does not merely compare bytes of text, but is aware of programming language syntax and program structure and hence is robust against many kinds of attempts to disguise similarities between plagiarized files.}{jplagwebsite}
+
+	JPlag is incorporated as a pre-built JAR file that gets written to disk and started via Java's ProcessBuilder API when needed. The JAR file is also tracked as a binary file in the VCS since JPlag could -- at the time of writing -- not be built from source independently.
+
+	JPlag is only used in the \lstinline|JPLAG| stage. See \ref{subsubsec:jplag}~JPLAG.
 
 	\section{Functionality}
 	Automark is used to automate the process of grading programming assignments in the programming language Java as far as possible and with superior stability. To facilitate this, Automark employs a design that seperates the process of reviewing assignments (called "pipeline") into multiple tasks (called "stages"). Each stage is dependent on the result of the respective previous stage.
@@ -414,22 +423,91 @@
 	In addition to the type a problem also includes a summary which contains either a short description or detailed diagnostic information such as a stacktrace. In case of the latter it will be shortened in reports sent out to students. Problems also record in which stage they occured.
 
 	\subsection{Stages}
-	Automark seperates the processing pipeline into nine stages. This section enumerates the stages and explains their implementation.
+	Automark seperates the processing pipeline into nine stages. This section enumerates the stages and explains their implementation (in order of execution).
 
-	\subsubsection{Download}
+	\subsubsection{DOWNLOAD}
 	The \lstinline|DOWNLOAD| stage is not an actual stage but rather a hyperonym to refer to either the \lstinline|BypassDownloadStage| or the \lstinline|MoodleScraperStage|. The whole program refers to them using the term \lstinline|DOWNLOAD| with the only exception being the configuration wizard.
 
 	\subsubsection{MoodleScraperStage}
 	This stage takes Moodle credentials (of the operator) as its parameters among others. It logs into Moodle, obtains the names and email addresses of students added to the assignment and checks if a submission is present. If it is, it is downloaded. If it is not, a \lstinline|NOT_SUBMITTED| problem is added to the submission entry for the student and it is excluded from further processing.
 
-	The web scraping features in this stage are implemented using the JSoup library (see \ref{sec:jsoup}~JSoup). JSoup is augmented to store cookies from server responses to implement sessions.
+	The web scraping features in this stage are implemented using the JSoup library (see \ref{subsubsec:jsoup}~JSoup). JSoup is augmented to store cookies from server responses to implement sessions.
 
 	\subsubsection{BypassDownloadStage}
-	This stage is an alternative to the \lstinline|MoodleScraperStage| and is mainly designed as an emergency solution if the \lstinline|MoodleScraperStage| breaks, for example due to an incompatible change in the Moodle website.
+	This stage is an alternative to the \lstinline|MoodleScraperStage| and is mainly designed as an emergency solution if the \lstinline|MoodleScraperStage| breaks, for example due to an incompatible change on the Moodle website.
 
 	The \lstinline|BypassDownloadStage| obtains submissions and metadata from a ZIP file which the operator can download from Moodle manually using the "Download all submissions" ("Alle Abgaben herunterladen" in German) option in the grading editor.
 
-	The stage optionally reads in a file called "emails.csv" which is a comma-seperated values file in the format \lstinline|Moodle name;email address| which it uses to map email addresses to submissions for potential later use in the \lstinline|EMAIL| stage. The lines in the file do not have to map exactly to the names in the "all submissions" ZIP file.
+	The stage optionally reads in a file called "emails.csv" which is a comma-separated values (using semicolons as separators) file in the format \lstinline|Moodle name;email address| which it uses to map email addresses to submissions for potential later use in the \lstinline|EMAIL| stage. The lines in the file do not have to map exactly to the names in the "all submissions" ZIP file.
 
 	Normally the \lstinline|BypassDownloadStage| does not mark missing submissions as \\\lstinline|NOT_SUBMITTED| since the "all submissions" ZIP file from Moodle does not contain any information from which the stage could infer that a student who has not submitted a solution exists. However, if an "emails.csv" file is present and the file contains one or more lines with names that do now match any submission, then the \lstinline|BypassDownloadStage| will create submission entries for those students, mark them as \lstinline|NOT_SUBMITTED| and exclude them from further processing.
+
+	\subsubsection{UNZIP}
+	This stage simply unpacks submissions, which are expected to be ZIP files at this point. If submissions are not ZIP files or otherwise incompatible with the Automark unzipping mechanism they are marked with an \lstinline|EXCEPTION| problem and excluded from further processing. If the file does not exist at all it is also marked with an \\\lstinline|INVALID_SUBMISSION_FILE| problem.
+
+	ZIP files are processed using zip4j. See \ref{subsubsec:zip4j}~Zip4j.
+
+	\subsubsection{EXTRACT}
+	Reads the \lstinline|sourceFiles| parameter from the config file which holds a comma-seperated list of Java file names and filters files in submissions recursively for these file names. If a submission does not contain any of the wanted files it is marked with the \lstinline|INVALID_SUBMISSION_FILE| problem and excluded from further processing.
+
+	\subsubsection{JPLAG} \label{subsubsec:jplag}
+	This stage's main objective is running the JPlag program (see \ref{subsec:jplag}~JPlag) to detect structural similarities between submission of the current assignment and with submissions of the same assignment from previous years.
+
+	To achieve this, it maintains a historical database (called the "JPlag repository") of all submissions for a given assignment over multiple years. Assignments are identified by their name (the \lstinline|assignmentName| parameter in the config file) since Moodle's assignment ID will probably change between years (since new courses are created with new assignments from Moodle's point of view). At the end of the \lstinline|JPLAG| stage all submissions are copied to the JPlag repository. The location of the JPlag repository is determined by the \lstinline|jplagRepository| parameter in the config file. It is recommended to use an absolute file path for this parameter but relative file paths are also possible.
+
+	The stage will not mark plagiarized submissions with the \lstinline|PLAGIARIZED| problem automatically. JPlag's detection is not accurate enough to facilitate this in all cases and parsing JPlag's generated report would be cumbersome. Instead, execution is explicitly halted after the \lstinline|JPLAG| and the generated JPlag report is opened in a browser (if the system supports it) for the operator to review. The \lstinline|JPLAG| stage and the \lstinline|SUMMARY| stage are the only stages that always halt execution.
+
+	If the \lstinline|JPLAG| stage is rolled back the JPlag repository will not be rolled back. It is the responsibility of the operator to keep the repository clean. If there is a clash between a submission in the repository and a submission in the current project (because the submission has already been copied to the repository), the submission from the repository will override the submission from the current project and nothing will be copied back to the repository. Submissions in the repository are contained in a single directory each in the folder of the current assignment. The submission folder follows the naming scheme "yyyy\_student\_slug" (see \ref{subsec:slug}). Deleting the submission folder is enough to remove the submission from the repository. %TODO: reference slug chapter
+
+	\subsubsection{PREPARE\_COMPILE}
+	In Automark, submissions are compiled in and loaded into the same JVM that Automark itself is running in. To avoid name clashes the \lstinline|PREPARE_COMPILE| stage assigns a unique package name to each submission and moves the submission's classes and a copy of all test suites to that package. Test suites are provided by the operator as Java files in a folder called "tests" at the project root and should contain a package header, although the package name doesn't matter. Classes are moved to the namespaced package by searching for and replacing the existing package header in the submission's Java files, then writing the new file contents to a file in the correct folder hierarchy for the package (since that's important for the Java compiler and class loader).
+
+	This stage could have been collapsed with the \lstinline|COMPILE| stage but it has been kept separate since it might be a good intervention point if something goes wrong with, for example, the package header patching and the operator needs to manually correct submission files (although in testing that never happened).
+
+	\subsubsection{COMPILE}
+	This stage invokes the Java compiler to compile the submission's source files. It first only runs on the source files provided by the student. Compilation errors after this phase are reported as \lstinline|COMPILATION_ERROR| problems and the submission is excluded from further processing. Afterwards, the compiler is run again on both the student's source files as well as the operator-provided test suites. Compilation errors in this phase are only logged to stdout for diagnostics but not marked as problems. However, if a test suite fails to compile, it will later be reported as a \lstinline|TEST_SUITE_FAILURE| in the \lstinline|TEST| stage due to the class loader being unable to load a class file that does not exist.
+
+	\pagebreak
+	A useful benefit of the Java compiler is that even when the compilation includes errors, it still successfully compiles classes that aren't affected by those errors. This allows Automark to, for example, compile and run test suites even when other test suites failed to compile. It is therefore recommended that operators split tests into relatively small test suites.
+
+	\subsubsection{TEST}
+	The \lstinline|TEST| stage's main objective is to load all classes in a submission and start JUnit via the junit-platform-launcher API (see \ref{subsubsec:junit5}~JUnit~5). JUnit then finds test suite classes automatically and executes the contained tests. Automark captures test results using the TestExecutionListener interface provided by JUnit to hook into the test execution cycle.
+
+	The stage also reads in all test suite sources (from the "tests" folder) prior to running JUnit and searches for test annotations and method names. From this information it builds a list of all available tests. This has the benefit of improving the reliability of reported results since the source of truth for the list of all existing tests is now independent of what JUnit finds. Additionally Automark uses this opportunity to provide operators with the ability to add descriptions to tests by simply adding a line-commend (\lstinline|//| in Java) in the line after the test annotation. With such a description a test declaration might look like this:
+
+	\begin{lstlisting}[language=java]
+		@Test
+		// Tests if `put(...)` works with a new key
+		public void b1_testPut_newKey_emptyMap() {
+			// bla bla bla...
+		}
+	\end{lstlisting}
+
+	Test descriptions are optional. Regular JUnit 5 test declarations work as well. Test descriptions are included as summaries in \lstinline|TEST_FAILURE| problems and are thus reported to students if report email is sent.
+
+	\subsubsection{SUMMARY}
+	The summary stage generates the reports sent out to students if the \lstinline|EMAIL| stage is used. It is broken out into a separate stage to give operators a chance to review and alter the mail that's about to be sent. For this reason execution is also explicitly halted after the \lstinline|SUMMARY| stage (the \lstinline|SUMMARY| stage can in fact not even generate new problems in submissions). The \lstinline|JPLAG| stage and the \lstinline|SUMMARY| stage are the only stages that always halt execution.
+
+	\pagebreak
+	\subsubsection{EMAIL}
+	The \lstinline|EMAIL| stage is optional and can be turned on or off via the boolean parameter \lstinline|emailStageEnabled| in the config file. If not enabled, it does nothing and immediately finishes. If enabled, it first tries to connect to the SMTP server specified in the config using the following parameters:
+	\begin{description}[align=left]
+		\item[smtpHost] The hostname of the SMTP server
+		\item[smtpPort] The port of the SMTP server
+		\item[smtpProtocol] Must be one of:
+			\begin{itemize}
+				\item \textbf{SMTP:} Plain-text SMTP with an optional STARTTLS upgrade \\if supported by the server
+				\item \textbf{SMTPS:} SMTP over TLS; \textbf{This is the recommended option.}
+				\item \textbf{SMTP\_TLS:} Initially plain-text SMTP with a mandatory \\STARTTLS upgrade
+			\end{itemize}
+		This parameter is based on Simple Java Mail's TransportStrategy enum type. See \href{http://www.simplejavamail.org/configuration.html#section-transport-strategies}{Simple Java Mail - Configuration § Transport strategies} for more information.
+		\item[smtpUsername] The username to use when connecting to the SMTP server; Can be blank, in which case Automark will prompt the operator for the value when executing the stage.
+		\item[smtpPassword] The password to use when connecting to the SMTP server; Can be blank, in which case Automark will prompt the operator for the value when executing the stage.
+		\item[smtpFromAddress] The email address to display in the "From" header of outgoing email; This is always required even if only one email address is available to the SMTP account.
+		\item[smtpFromName] The name to display in the "From" header of outgoing email; This is always required even if only one email address is available to the SMTP account.
+	\end{description}
+
+	Then the \lstinline|EMAIL| stage sends each report generated by the \lstinline|SUMMARY| stage as an email to the student. If a student is not associated with an email address, the submission will be marked with an \lstinline|EXCEPTION| problem.
+
+	Rolling this stage back has no real effect. If this stage fails midway through sending reports out to students, it is recommended the operator deletes all reports already sent from the summary folder before running the \lstinline|EMAIL| stage again to avoid double-mail for some students. Which reports have already been sent can be seen in stdout.
 \end{document}
