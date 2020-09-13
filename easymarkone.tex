@@ -15,10 +15,12 @@
 \usepackage{tabto}
 \usepackage{dashrule}
 \usepackage[backend=biber,style=authoryear]{biblatex}
-\usepackage{listings}
+\usepackage{listings,lstautogobble}
 \usepackage{scrextend}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage{float}
+\usepackage{wrapfig}
 
 \ifdefined\EasyMarkPrivateBuild
 	\input{private.tex}
@@ -34,6 +36,7 @@
 \addtolength{\oddsidemargin}{1cm}
 \addtolength{\evensidemargin}{1cm}
 
+\lstset{autogobble=true}
 \lstset{language=sh,basicstyle=\ttfamily}
 \lstset{language=java,basicstyle=\ttfamily}
 
@@ -387,6 +390,9 @@
 	\subsubsection{Spark}
 	Spark is a web server framework for JVM languages (with special focus on Java and Kotlin)\parencite{sparkwebsite}. It is used to provide the in-Browser GUI locally and with security restrictions. %TODO: refenrence GUI security restrictions chapter
 
+	\subsubsection{Preact} \label{subsubsec:preact}
+	Preact is a \emph{Fast 3kB alternative to React with the same modern API}\parencite{preactwebsite}. It is used to simplify the user interface logic in complex web applications which results in cleaner code and less UI bugs. Preact in particular was chosen over its competitors like React because of its ease of integration.
+
 	\pagebreak
 	\subsection{JPlag} \label{subsec:jplag}
 	\BlockCite{JPlag is a system that finds similarities among multiple sets of source code files. This way it can detect software plagiarism. JPlag does not merely compare bytes of text, but is aware of programming language syntax and program structure and hence is robust against many kinds of attempts to disguise similarities between plagiarized files.}{jplagwebsite}
@@ -414,7 +420,7 @@
 		\item[EXCEPTION] Denotes that a Java exception was thrown while processing the submission. This most frequently occurs due to invalid or malformed input in submissions.
 		\item[NOT\_SUBMITTED] Denotes that while it was captured that the student has been added to the assignment the student did not submit a solution.
 		\item[INVALID\_SUBMISSION\_FILE] Used to report a variety of problems with the submission file(s) that were not captured as a Java exception during processing.
-		\item[PLAGIARIZED] Denotes that a submission contains similarities with another submission of the same assignment or a submission of the assignment from a previous year. This problem type is not assigned automatically. See plagiarism detection. %TODO: reference plagiarism detection chapter
+		\item[PLAGIARIZED] Denotes that a submission contains similarities with another submission of the same assignment or a submission of the assignment from a previous year. This problem type is not assigned automatically. See \ref{subsubsec:jplag}~JPLAG.
 		\item[COMPILATION\_ERROR] Denotes that the Java compiler reported one or more errors while compiling the source files in the submission. If the compiler reports errors while compiling the operator-provided test suites with the sources it is not reported as a \lstinline|COMPILATION_ERROR| but rather as a \lstinline|TEST_SUITE_FAILURE|.
 		\item[TEST\_SUITE\_FAILURE] Denotes that, during the \lstinline|TEST| stage, a whole test suite either was not completed (for example due to a timeout) or was not started in the first place (for example due to a compilation error).
 		\item[TEST\_FAILURE] Denotes a failure of a JUnit test during the \lstinline|TEST| stage on the given submission.
@@ -440,15 +446,15 @@
 
 	The stage optionally reads in a file called "emails.csv" which is a comma-separated values (using semicolons as separators) file in the format \lstinline|Moodle name;email address| which it uses to map email addresses to submissions for potential later use in the \lstinline|EMAIL| stage. The lines in the file do not have to map exactly to the names in the "all submissions" ZIP file.
 
-	Normally the \lstinline|BypassDownloadStage| does not mark missing submissions as \\\lstinline|NOT_SUBMITTED| since the "all submissions" ZIP file from Moodle does not contain any information from which the stage could infer that a student who has not submitted a solution exists. However, if an "emails.csv" file is present and the file contains one or more lines with names that do now match any submission, then the \lstinline|BypassDownloadStage| will create submission entries for those students, mark them as \lstinline|NOT_SUBMITTED| and exclude them from further processing.
+	Normally the \lstinline|BypassDownloadStage| does not mark missing submissions as \linebreak\lstinline|NOT_SUBMITTED| since the "all submissions" ZIP file from Moodle does not contain any information from which the stage could infer that a student who has not submitted a solution exists. However, if an "emails.csv" file is present and the file contains one or more lines with names that do now match any submission, then the \lstinline|BypassDownloadStage| will create submission entries for those students, mark them as \lstinline|NOT_SUBMITTED| and exclude them from further processing.
 
 	\subsubsection{UNZIP}
-	This stage simply unpacks submissions, which are expected to be ZIP files at this point. If submissions are not ZIP files or otherwise incompatible with the Automark unzipping mechanism they are marked with an \lstinline|EXCEPTION| problem and excluded from further processing. If the file does not exist at all it is also marked with an \\\lstinline|INVALID_SUBMISSION_FILE| problem.
+	This stage simply unpacks submissions, which are expected to be ZIP files at this point. If submissions are not ZIP files or otherwise incompatible with the Automark unzipping mechanism they are marked with an \lstinline|EXCEPTION| problem and excluded from further processing. If the file does not exist at all it is also marked with an \linebreak\lstinline|INVALID_SUBMISSION_FILE| problem.
 
 	ZIP files are processed using zip4j. See \ref{subsubsec:zip4j}~Zip4j.
 
 	\subsubsection{EXTRACT}
-	Reads the \lstinline|sourceFiles| parameter from the config file which holds a comma-seperated list of Java file names and filters files in submissions recursively for these file names. If a submission does not contain any of the wanted files it is marked with the \lstinline|INVALID_SUBMISSION_FILE| problem and excluded from further processing.
+	Reads the \lstinline|sourceFiles| parameter from the config file which holds a comma-seperated list of Java file names and filters files in submissions recursively for these file names. If a submission does not contain any of the wanted files it is marked with the \linebreak\lstinline|INVALID_SUBMISSION_FILE| problem and excluded from further processing.
 
 	\subsubsection{JPLAG} \label{subsubsec:jplag}
 	This stage's main objective is running the JPlag program (see \ref{subsec:jplag}~JPlag) to detect structural similarities between submission of the current assignment and with submissions of the same assignment from previous years.
@@ -457,7 +463,7 @@
 
 	The stage will not mark plagiarized submissions with the \lstinline|PLAGIARIZED| problem automatically. JPlag's detection is not accurate enough to facilitate this in all cases and parsing JPlag's generated report would be cumbersome. Instead, execution is explicitly halted after the \lstinline|JPLAG| and the generated JPlag report is opened in a browser (if the system supports it) for the operator to review. The \lstinline|JPLAG| stage and the \lstinline|SUMMARY| stage are the only stages that always halt execution.
 
-	If the \lstinline|JPLAG| stage is rolled back the JPlag repository will not be rolled back. It is the responsibility of the operator to keep the repository clean. If there is a clash between a submission in the repository and a submission in the current project (because the submission has already been copied to the repository), the submission from the repository will override the submission from the current project and nothing will be copied back to the repository. Submissions in the repository are contained in a single directory each in the folder of the current assignment. The submission folder follows the naming scheme "yyyy\_student\_slug" (see \ref{subsec:slug}). Deleting the submission folder is enough to remove the submission from the repository. %TODO: reference slug chapter
+	If the \lstinline|JPLAG| stage is rolled back the JPlag repository will not be rolled back. It is the responsibility of the operator to keep the repository clean. If there is a clash between a submission in the repository and a submission in the current project (because the submission has already been copied to the repository), the submission from the repository will override the submission from the current project and nothing will be copied back to the repository. Submissions in the repository are contained in a single directory each in the folder of the current assignment. The submission folder follows the naming scheme "yyyy\_student\_slug" (see \ref{subsec:slugs}~Slugs). Deleting the submission folder is enough to remove the submission from the repository.
 
 	\subsubsection{PREPARE\_COMPILE}
 	In Automark, submissions are compiled in and loaded into the same JVM that Automark itself is running in. To avoid name clashes the \lstinline|PREPARE_COMPILE| stage assigns a unique package name to each submission and moves the submission's classes and a copy of all test suites to that package. Test suites are provided by the operator as Java files in a folder called "tests" at the project root and should contain a package header, although the package name doesn't matter. Classes are moved to the namespaced package by searching for and replacing the existing package header in the submission's Java files, then writing the new file contents to a file in the correct folder hierarchy for the package (since that's important for the Java compiler and class loader).
@@ -488,8 +494,7 @@
 	\subsubsection{SUMMARY}
 	The summary stage generates the reports sent out to students if the \lstinline|EMAIL| stage is used. It is broken out into a separate stage to give operators a chance to review and alter the mail that's about to be sent. For this reason execution is also explicitly halted after the \lstinline|SUMMARY| stage (the \lstinline|SUMMARY| stage can in fact not even generate new problems in submissions). The \lstinline|JPLAG| stage and the \lstinline|SUMMARY| stage are the only stages that always halt execution.
 
-	\pagebreak
-	\subsubsection{EMAIL}
+	\subsubsection{EMAIL} \label{subsubsec:email}
 	The \lstinline|EMAIL| stage is optional and can be turned on or off via the boolean parameter \lstinline|emailStageEnabled| in the config file. If not enabled, it does nothing and immediately finishes. If enabled, it first tries to connect to the SMTP server specified in the config using the following parameters:
 	\begin{description}[align=left]
 		\item[smtpHost] The hostname of the SMTP server
@@ -510,4 +515,218 @@
 	Then the \lstinline|EMAIL| stage sends each report generated by the \lstinline|SUMMARY| stage as an email to the student. If a student is not associated with an email address, the submission will be marked with an \lstinline|EXCEPTION| problem.
 
 	Rolling this stage back has no real effect. If this stage fails midway through sending reports out to students, it is recommended the operator deletes all reports already sent from the summary folder before running the \lstinline|EMAIL| stage again to avoid double-mail for some students. Which reports have already been sent can be seen in stdout.
+
+	\subsection{Slugs} \label{subsec:slugs}
+	To avoid name collisions, submissions are internally referred to using so-called "slugs", i.e. human-readable unique identifiers. Submission slugs in Automark consist of the student name in snake case (fully lowercase, underscores replace spaces) concatenated with another underscore and an arbitrary unique but humanly comprehensible number. Automark assigns these numbers consecutively when it initially creates submission entries.
+
+	\subsection{Config File}
+	Each assignment directory must contain a file called "config.properties", referred to as the config file. In the GUI such a file can be created via the "New Assignment" screen. The CLI does not have a builtin way of bootstrapping an assignment, so operators using the CLI would either have to write the config file themselves, copy a previous config file and adjust it or use the GUI to create the config file.
+
+	The config file is in the Java properties file format which is -- in simplified terms -- a list of key-value pairs separated by an equals sign (\lstinline|=|).
+
+	An example config file might look like this:
+	\begin{lstlisting}
+		assignmentName=MyMap
+		assignmentID=27815
+		jplagLanguage=java17
+		jplagRepository=/path/to/repo
+		downloadStage=moodle
+		moodleBaseURL=https\://my-moodle-site.org/myschoolname
+		moodleUsername=myuser123
+		moodleTeachers=teacher1@school.org teacher2@school.org
+		sourceFiles=MyMap.java, Entry.java, Node.java
+		emailStageEnabled=true
+		smtpHost=127.0.0.1
+		smtpPort=3025
+		smtpUsername=foo
+		smtpProtocol=SMTPS
+		smtpFromAddress=automark@local
+		smtpFromName=Automark
+	\end{lstlisting}
+
+	\subsubsection{Config File Options}
+
+	\begin{description}
+		\item[downloadStage] The download stage to use; Possible values: \lstinline|moodle| or \lstinline|bypass|
+		\item[assignmentID] Numeric assignment ID given to the assignment by Moodle
+		\item[assignmentName] Any name by which the operator will recognize the assignment;\linebreak{}Not tied to Moodle
+		\item[jplagLanguage] The language setting to use for JPlag (see \lstinline|jplag --help|)
+		\item[jplagRepository] The directory to use as the JPlag repository; Relative paths are possible but absolute paths are recommended.
+		\item[moodleBaseURL] The URL of your Moodle's login page minus the trailing \lstinline|/login/index.php|
+		\item[moodlePassword] The operator's Moodle password; \textbf{Optional:} The operator will be asked for it if it hasn't been provided upfront.
+		\item[moodleTeachers] Email addresses of teachers in the Moodle course of the assignment; No email will be sent to these addresses. They are merely required to filter the Moodle accounts of teachers from the pipeline.
+		\item[moodleUsername] The operator's Moodle username; \textbf{Optional:} The operator will be asked for it if it hasn't been provided upfront.
+		\pagebreak
+		\item[sourceFiles] Comma-seperated list of Java files to regard as part of the assignment and use for testing
+		\item[emailStageEnabled] Boolean value; whether to enable the \lstinline|EMAIL| stage
+		\item[smtpHost] See \ref{subsubsec:email}~EMAIL
+		\item[smtpPort] See \ref{subsubsec:email}~EMAIL
+		\item[smtpUsername] See \ref{subsubsec:email}~EMAIL
+		\item[smtpPassword] See \ref{subsubsec:email}~EMAIL
+		\item[smtpProtocol] See \ref{subsubsec:email}~EMAIL
+		\item[smtpFromName] See \ref{subsubsec:email}~EMAIL
+		\item[smtpFromAddress] See \ref{subsubsec:email}~EMAIL
+
+	\end{description}
+
+	\section{User Interface}
+	Automark can be used both via the command line and over a GUI. The command line interface (CLI) was implemented first and is well-suited for integrating Automark into other automation workflows or for users who prefer the command line. The GUI was added later as a means to flatten the learning curve for new adopters, however some users might find they are faster with the GUI.
+
+	Functionally, the GUI and the command line are equal except that the GUI includes a powerful configuration editor for intuitive creation and editing of assignment configurations. There is no analogy for that in the CLI. CLI users can either write the configuration file themselves (or partially re-use previous configuration files) or temporarily use the GUI to generate it.
+
+	\subsection{Command-Line Interface}
+	Automark's command-line interface is designed to be non-interactive as much as possible. "Non-interactive" means the running process will not ask for input via stdin but rather read all of its parameters from the command-line and if it needs additional parameters the user has to run the program with those parameters. This style of usage is standard practice for command-line programs as it enables easier automation via (shell) scripting.
+
+	The CLI is partitioned into several subcommands with specific options and some common options.
+
+	\subsubsection{Subcommands}
+	\begin{description}
+		\item[run] Starts execution from the last completed stage
+
+		This is also the default subcommand when no subcommand is specified.
+
+		\textbf{Syntax:} \lstinline|automark [run]|
+
+		\pagebreak
+		\item[status] Displays details about the current state of submissions
+
+		\textbf{Syntax:} \lstinline|automark status|
+
+		\item[rollback] Deletes the results of every stage after \emph{and including} a specified target stage and marks these stages as not completed
+
+		A rollback does not revert global state like the JPlag repository or sent email.
+
+		\textbf{Syntax:} \tabto{75pt}\lstinline|automark rollback <stage>|\\
+		\textbf{Arguments:}\tabto{75pt}\lstinline|<stage>| is the name of the target stage (for example \lstinline|COMPILE|)
+		\item[mark-resolved] Marks one or more problems in one or more submissions as resolved without actually changing anything about the submission
+
+		Works after every stage but only affects the results of the most recently completed stage so if the operator rolls back, this will be reverted.
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|automark mark-resolved <slug> [--problem <ident>]|
+		\tabto{75pt}\lstinline|  [--requalify]|\\
+		\textbf{Arguments:}\tabto{75pt}\lstinline|<slug>| is the slug of the submission to operate on or \lstinline|_| (underscore) to operate on all submissions.
+
+		\lstinline|--problem <ident>| must be present if the operator wants to mark one or more problems as resolved. \lstinline|<ident>| is either the name of the problem (for example \lstinline|EXCEPTION| to match \lstinline|EXCEPTION| problems) or the numerical position of a single problem in the output of automark status. If a problem name is specified, all matching problems are marked as resolved.
+
+		\lstinline|--requalify| must be present if the operator wants to re-include a submission that has been excluded from further processing due to a critical problem.
+
+		mark-resolved without either \lstinline|--problem| or \lstinline|--requalify| is a no-op.
+
+		\item[mark-plagiarized] Tags one or more submissions with the \lstinline|PLAGIARIZED| problem
+
+		Works after every stage but only affects the results of the most recently completed stage so if the operator rolls back, this will be reverted.
+
+		Can be reverted using mark-resolved.
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|automark mark-plagiarized <slugs>|\\
+		\textbf{Arguments:}\tabto{75pt}\lstinline|<slugs>| is one or more space-seperated submission slugs to mark as plagiarized (see \ref{subsec:slugs}~Slugs). Note that this parameter might have to be in quotes (\lstinline|"|) to specify more than one slug, depending on the shell used.
+
+		\item[gui] Starts the GUI
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|automark gui|
+
+		\item[manual] Shows a manual similar to this chapter in the browser
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline[mathescape]!automark <manual|--help|-h>!
+	\end{description}
+
+	\pagebreak
+	\subsubsection{Common Options}
+	To this date there is only one option that is usable regardless of the subcommand (excluding debug options) and that is \lstinline|--workingDir| or \lstinline|-d| for short. This option sets the working directory for Automark. Usually the operator would run Automark in the directory of an assignment (where the assignment config file is). \lstinline|--workingDir| allows operators to run Automark from a different directory than the assignment directory.
+
+	\subsection{GUI}
+	The GUI was developed after the CLI so it simply acts as a wrapper to invoke the same subcommands that are also available in the CLI, for the most part. However, it doesn't look like a typical "CLI wrapper"-style GUI since it cleverly works around that using an easy-to-grasp information-dense design.
+
+	\begin{figure}[h]
+		\includegraphics[width=\textwidth]{automark_dashboard.png}
+		\caption{Screenshot of the Automark dashboard running the \lstinline|TEST| stage; Personally identifiable information has been blurred.} \label{fig:automarkdashboard}
+	\end{figure}
+
+	The GUI consists of several main components which this chapter aims to explain further.
+
+	\pagebreak
+	\subsubsection{Start Screen}
+	The start screen is only visible when Automark is not started in an assignment directory. It provides access to the configuration editor as the "New Assignment" screen and the "Open" dialog.
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=10cm]{automark_start_screen.png}
+		\caption{Automark start screen}
+	\end{figure}
+
+	\subsubsection{Dashboard}
+	The dashboard is the main screen of Automark. It displays information about submissions and lets the operator interact with them. See \autoref{fig:automarkdashboard}.
+
+	\subsubsection{Toolbar}
+	The toolbar holds some of the most frequently used functionality in Automark.
+
+	\begin{figure}[h]
+		\includegraphics[width=\textwidth]{automark_toolbar.png}
+		\caption{Automark toolbar on an assignment called "MyMap"}
+	\end{figure}
+
+	From left to right: \textbf{New} and \textbf{Edit} both open the configuration editor, in the case of the former as the "New Assignment" screen, in the case of the latter as the "Edit Assignment" screen. \textbf{Open} opens the "Open" dialog. \textbf{Run} and \textbf{Rollback} correspond to their CLI counterparts.
+
+	\pagebreak
+	\subsubsection{Configuration Editor}
+	The configuration editor provides a way for the operator to edit and create config files that is more user-friendly than writing the files by hand.
+
+	It is available in two variants for the "New Assignment" and the "Edit Assignment" screens.
+
+	\begin{figure}[h]
+		\includegraphics[width=\textwidth]{automark_configuration_editor.png}
+		\caption{Cropped screenshot of the configuration editor seen as the "Edit Assignment" screen}
+	\end{figure}
+
+	\subsubsection{Open Dialog}
+	The open dialog is a simple file picker for directories to switch the active assignment.
+
+	\pagebreak
+	\subsubsection{Stage List}
+	The stage list is the leftmost component of the dashboard. It displays the current status of completed and running stages and allows the operator to switch the stage results displayed in the submissions table.
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=5cm,trim=0 30cm 78.9cm 1.5cm,clip]{automark_dashboard.png}
+		\caption{Automark stage list}
+	\end{figure}
+
+	\subsubsection{Submissions Table}
+	The submissions table displays an overview as well as detailed information about submissions. Its color-coded "problem rainbow" lets the operator quickly find problems in submissions and, if needed, mark them as resolved.
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=10cm,trim=11.5cm 10cm 40cm 2cm,clip]{automark_dashboard_w_details_expanded.png}
+		\caption{Automark submissions table}
+	\end{figure}
+
+	\subsubsection{Terminal Output}
+	The rightmost panel on the Automark dashboard relays output that would have been printed to stdout when used over the CLI. Input is not handled by this panel but rather by pop-up windows, since implementing a web-based terminal emulator or even integrating an existing solution would have been out of scope for the Easy Mark One project.
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=10cm,trim=56cm 20cm 0 2cm,clip]{automark_dashboard_w_details_expanded.png}
+		\caption{Automark terminal output panel}
+	\end{figure}
+
+	\subsubsection{Manual Page}
+	Similarly to the CLI the GUI includes a formatted version of the manual page. it can be read by following the "Help" link on the dashboard. The manual page also describes in detail how GUI actions are related to CLI subcommands.
+
+	\subsection{Internal Structure}
+
+	\begin{wrapfigure}[16]{l}{.4\textwidth}
+		\vskip-20pt
+		%\includegraphics[width=.35\textwidth]{automark_code_structure.png}
+		\includegraphics[width=.312\textwidth]{automark_code_structure.png}
+		\caption{Automark's structure}
+	\end{wrapfigure}
+
+	Automark's code is divided by responsibility and grouped into accordingly named packages.
+
+	It uses object-oriented programming (OOP) features very sparingly to avoid common OOP pitfalls like unnecessary or premature abstraction. Instead it relies mostly on static methods, switches and enum types and limits state to the method boundaries to facilitate a more procedural programming style.
+
+	Stages are implemented as public static methods called "run" in the respective stage class and take the current working directory, the parsed config and the current submission metadata as their parameters. They are given full access to the file system but are expected to not modify the results from previous stages. Stage methods return an updated instance of the submission metadata (can be the same as the argument given to it). The returned metadata is then written to disk by the framework which marks the stage as completed. This design provides strong safety guarantees: If a stage crashes midway through, the metadata is never written and it is not regarded as completed.
+
+	The GUI is implemented in JavaScript using Preact (see \ref{subsubsec:preact}~Preact). Action invocations are handled largely by preparing arguments for and calling subcommand methods (from within the program, not via the command line interface).
+
 \end{document}
