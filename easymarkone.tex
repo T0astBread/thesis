@@ -14,13 +14,14 @@
 \usepackage{mwe,tikz}
 \usepackage{tabto}
 \usepackage{dashrule}
-\usepackage[backend=biber,style=authoryear]{biblatex}
+\usepackage[backend=biber,style=verbose]{biblatex}
 \usepackage{listings,lstautogobble}
 \usepackage{scrextend}
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage{wrapfig}
+\usepackage{makecell}
 
 \ifdefined\EasyMarkPrivateBuild
 	\input{private.tex}
@@ -317,6 +318,16 @@
 	Unlike Automark, EasyMark does not aim to replace existing tools (which in this case would be learning management systems like Moodle or WebUntis). Rather, it extends them with new features not available in currently employed LMS solutions and fosters cooperation with existing systems by providing functionality to link to and import from third party platforms such as Moodle.
 
 	EasyMark also employs unparalleled security and data protection features. Personally identifiable information (such as names) are encrypted and only accessible via the teacher's access token. Bad actors who gain access to the server are not able to read the protected information from the database file. In addition to that, EasyMark gives teachers and students deep insight over what happens to their accounts. Teachers and students have the ability to view and revoke currently active sessions on their account. Teachers also see an append-only log of all actions conducted with their account to quickly detect intrusion.
+
+	\chapter{Project Management}
+
+	\section{Individual Responsibilities}
+	Since \IfPrivateBuild{\EmRealAuthorName}{T0astBread} was the only author they were responsible for the whole Easy Mark One project including the Automark subproject and the EasyMark subproject.
+
+	\section{Time}
+	The planned project duration was 180 hours. The time recorded is 270 hours, the actual total work time is estimated to approach 300 hours.
+
+	The overshoot can be explained by an unforeseen expansion of requirements during the development phase.
 
 	\iffalse
 	\chapter{Quick-Start Guide}
@@ -885,7 +896,8 @@
 	\subsubsection{Admin Dashboard}
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=.95\textwidth]{easymark_admin_dashboard.png}
+		\includegraphics[width=.85\textwidth]{easymark_admin_dashboard.png}
+		\caption{Screenshot of the Automark admin dashboard}
 	\end{figure}
 
 	The admin dashboard is what admins see when they log in.
@@ -899,7 +911,8 @@
 
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width={.95\textwidth}]{easymark_course_editor.png}
+		\includegraphics[width={.85\textwidth}]{easymark_course_editor.png}
+		\caption{Screenshot of the Automark course editor}
 	\end{figure}
 
 	\subsubsection{Grading Editor}
@@ -918,7 +931,10 @@
 	\subsubsection{Settings Page}
 	\begin{wrapfigure}[13]{l}{.55\textwidth}
 		\vskip-15pt
-		\includegraphics[width=.55\textwidth,trim=0 1cm 0 0,clip]{easymark_settings.png}
+		\centering
+		\includegraphics[width=.475\textwidth,trim=0 1cm 0 0,clip]{easymark_settings.png}
+		\vskip0pt
+		\caption{Screenshot of the settings page}
 	\end{wrapfigure}
 
 	The settings page gives admins the ability to export and re-import encrypted data for their account, for backup purposes. This is especially useful when an admin forgets their access token and has to have it reset, since encrypted data associated with that admin on the server is unrecoverable after an AT reset.
@@ -1033,6 +1049,69 @@
 
 	\subsubsection{Helpers for Interactive Use}
 	Some programs have also been configured for interactive use (i.e. when logging into the server over SSH). This includes Git and the "micro" editor.
+
+	\printbibliography
+
+	\pagebreak
+	\listoffigures
+
+	\IfPrivateBuild{
+		\pagebreak
+		\chapter*{\hspace{5pt}Begleitprotokoll}
+		\begin{flushleft}
+			\small
+			Thema des übergeordneten komplexen Aufgabenbereichs oder Projekts:
+			\linebreak
+			\Large
+			Easy Mark One
+			\vskip0pt
+			\small
+			Individuelle Themenstellung:
+			\linebreak
+			\Large
+			Projektdurchführung
+			\vskip15pt
+			\small
+			Betreuer/in:{\large\tabto{4cm}\EmSupervisorName}\linebreak
+			E-Mail-Adresse:{\large\tabto{4cm}\EmSupervisorEmail}\linebreak
+			Telefonnummer:{\large\tabto{4cm}--}\linebreak
+			\vskip15pt
+			\small
+			Name der Diplomandin/des Diplomanden und Klasse:{\large\tabto{4cm}\EmRealAuthorName, \EmAuthorClass}\linebreak
+			E-Mail-Adresse:{\large\tabto{4cm}\EmRealAuthorEmail}\linebreak
+			Telefonnummer:{\large\tabto{4cm}--}\linebreak
+			\vskip15pt
+			\small
+			Name der Kooperationspartnerin/des Kooperationspartners und Ansprechperson:{\large\tabto{4cm}\EmPartnerName, \EmPartnerPersonName}\linebreak
+			E-Mail-Adresse:{\large\tabto{4cm}\EmPartnerPersonEmail}\linebreak
+			Telefonnummer:{\large\tabto{4cm}--}\linebreak
+			\vskip15pt
+			\small
+			Teammitglieder:{\large\tabto{4cm}\EmRealAuthorName}
+			\vskip15pt
+			\fontsize{10pt}{10pt}
+			\selectfont
+			\begin{tabular}{c|c|c|c|c|c}
+				\makecell{Datum der\\Besprechung} & \makecell{Teilnehmer/innen\\der Besprechung} & Vereinbarungen & \makecell{Termin zur\\Erledigung} & \makecell{Paraphe\\Betreuer/in} & \makecell{Paraphe\\Schüler/innen} \\ \hline
+				26.06.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{Implementierung\\Automark stages, CLI,\\ Rollback/mark-resolved} & 03.07.2020 & & \\
+				03.07.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{BypassDownload-\\Stage, GUI} & 10.07.2020 & & \\
+				10.07.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{Configuration\\Editor, Manual} & 17.07.2020 & & \\
+				17.07.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{EMAIL stage,\\Bug fixes} & 24.07.2020 & & \\
+				24.07.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{EasyMark: Database,\\Sessions} & 07.08.2020 & & \\
+				07.08.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{Admin pages} & 14.08.2020 & & \\
+				07.08.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{Admin pages,\\participant page} & 14.08.2020 & & \\
+				14.08.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{Bulk import/-\\export, Settings} & 21.08.2020 & & \\
+				21.08.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{Cloud-Host} & 03.09.2020 & & \\
+				03.09.2020 & \makecell{\EmSupervisorName,\\\EmRealAuthorName} & \makecell{Security-Features:\\Session manager,\\Activity Log} & 10.09.2020 & & \\
+			\end{tabular}
+		\vskip35pt
+		\fontsize{8pt}{8pt}
+		\selectfont
+		Datum: \hdashrule[0pt][x]{3cm}{.5pt}{.75mm}
+		\hspace{\fill}
+		Unterschrift der Schülerin/des Schülers: \hdashrule[0pt][x]{4cm}{.5pt}{.75mm}
+		\end{flushleft}
+	}{}
 
 	\Appendix{
 		\vskip-3.5cm
