@@ -22,6 +22,7 @@
 \usepackage{float}
 \usepackage{wrapfig}
 \usepackage{makecell}
+\usepackage[german,english]{babel}
 
 \ifdefined\EasyMarkPrivateBuild
 	\input{private.tex}
@@ -180,6 +181,7 @@
 \begin{document}
 	\pagenumbering{gobble}
 	\IfPrivateBuild{
+		\selectlanguage{german}
 		\includegraphics[width=\textwidth]{school-header.png}
 		{\centering
 			\vskip1cm
@@ -206,15 +208,18 @@
 				Datum:\tabto{10cm}Betreuer/Beteuerin:
 			\end{flushleft}
 		}
+		\selectlanguage{english}
 	}{
 		\maketitle
 		\pagebreak
 	}
 	\IfPrivateBuild{
-		\chapter*{Erklärung gemäß Prüfungsordnung}
+		\selectlanguage{german}
+		\chapter*{\hspace{5pt}Erklärung gemäß Prüfungsordnung}
 		„Ich erkläre an Eides statt, dass ich die vorliegende Diplomarbeit selbstständig und ohne fremde Hilfe verfasst, andere als die angegebenen Quellen und Hilfsmittel nicht benutzt und alle den benutzten Quellen wörtlich oder sinngemäß entnommenen Stellen als solche kenntlich gemacht habe.“
 
 		\EmPhysicalLocation, \today\tabto{9cm}{Verfasser*innen:}
+		\selectlanguage{english}
 
 		\SignatureLine{\EmRealAuthorName}
 		\newpage
