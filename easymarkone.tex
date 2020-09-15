@@ -160,6 +160,15 @@
 	\end{addmargin}
 }
 
+\newcounter{appendix}
+\newcommand{\Appendix}[1]{
+	\stepcounter{appendix}
+	\chapter*{\hspace{\fill}Appendix \Alph{appendix}} \label{app:\Alph{appendix}}
+	#1
+}
+
+\newcommand{\RefAppendix}[1]{\hyperref[app:#1]{Appendix~#1}}
+
 
 \title{Easy Mark One}
 \author{\IfPrivateBuild{\EmRealAuthorName}{T0astBread}}
@@ -352,23 +361,24 @@
 	\fi
 
 	\chapter{Automark}
+	Automark is a tool to automate the task of reviewing programming assignments.
 
 	\section{Technology Used}
 	Automark is implemented on top of Java and incorporates various libraries to provide some of its functionality. It has been written using the IntelliJ IDEA IDE and the Gradle build system.
 
-	\subsection{Java}
+	\subsection{Java} \label{subsec:java}
 	Java is a class-based, object-oriented programming language that runs on its own virtual machine (VM) called the JVM and can thus run on any operating system that implements a JVM\parencite{oraclethejavalangenvironment}. The technology was chosen because of the familiarity of the author and the cooperation partner with the language and the (in the field of programming) well-known stability of the language.
 
-	\subsection{Gradle}
+	\subsection{Gradle} \label{subsec:gradle}
 	Gradle is a system to automate compilation, linking and packaging (in combination referred to as "building") for a variety of languages including Java. In addition to simplifying software builds it also caches results and avoids re-compiling up-to-date compilation units (classes in Java). Gradle is also well-integrated into the IDE used.\parencite{gradlewebsite}
 
-	\subsection{IntelliJ IDEA}
+	\subsection{IntelliJ IDEA} \label{subsec:intellijidea}
 	IntelliJ IDEA is an integrated development environment (IDE) from JetBrains s.r.o.\parencite{intellijwebsite} An integrated developmentcan be viewed as an advanced text editor that offers convenience features for the programmer, such as syntax highlighting, context-aware code completion, debugging and build integration\parencite{stevenjzeilintegrated}\parencite{idewikipedia}. IntelliJ was chosen because of the author's familiarity and satisfaction with it. The Apache-2.0-licensed Community edition was used.
 
 	\subsection{Libraries}
 	Automark uses a few libraries to provide some of its functionality.
 
-	\subsubsection{GSON}
+	\subsubsection{GSON} \label{subsubsec:gson}
 	GSON is a Java library by Google for simple serialization and deserialization of Java objects to and from JSON objects and arrays\parencite{gsongithub}. It was chosen since it operates using Java's reflection feature which spares the developer from having to write explicit parsing code.
 
 	\subsubsection{JSoup} \label{subsubsec:jsoup}
@@ -585,18 +595,18 @@
 
 		This is also the default subcommand when no subcommand is specified.
 
-		\textbf{Syntax:} \lstinline|automark [run]|
+		\textbf{Syntax:}\tabto{75pt}\lstinline|automark [run]|
 
 		\pagebreak
 		\item[status] Displays details about the current state of submissions
 
-		\textbf{Syntax:} \lstinline|automark status|
+		\textbf{Syntax:}\tabto{75pt}\lstinline|automark status|
 
 		\item[rollback] Deletes the results of every stage after \emph{and including} a specified target stage and marks these stages as not completed
 
 		A rollback does not revert global state like the JPlag repository or sent email.
 
-		\textbf{Syntax:} \tabto{75pt}\lstinline|automark rollback <stage>|\\
+		\textbf{Syntax:}\tabto{75pt}\lstinline|automark rollback <stage>|\\
 		\textbf{Arguments:}\tabto{75pt}\lstinline|<stage>| is the name of the target stage (for example \lstinline|COMPILE|)
 		\item[mark-resolved] Marks one or more problems in one or more submissions as resolved without actually changing anything about the submission
 
@@ -639,6 +649,7 @@
 
 	\begin{figure}[h]
 		\includegraphics[width=\textwidth]{automark_dashboard.png}
+		\vskip0pt
 		\caption{Screenshot of the Automark dashboard running the \lstinline|TEST| stage; Personally identifiable information has been blurred.} \label{fig:automarkdashboard}
 	\end{figure}
 
@@ -662,6 +673,7 @@
 
 	\begin{figure}[h]
 		\includegraphics[width=\textwidth]{automark_toolbar.png}
+		\vskip0pt
 		\caption{Automark toolbar on an assignment called "MyMap"}
 	\end{figure}
 
@@ -675,6 +687,7 @@
 
 	\begin{figure}[h]
 		\includegraphics[width=\textwidth]{automark_configuration_editor.png}
+		\vskip0pt
 		\caption{Cropped screenshot of the configuration editor seen as the "Edit Assignment" screen}
 	\end{figure}
 
@@ -729,4 +742,301 @@
 
 	The GUI is implemented in JavaScript using Preact (see \ref{subsubsec:preact}~Preact). Action invocations are handled largely by preparing arguments for and calling subcommand methods (from within the program, not via the command line interface).
 
+	\chapter{EasyMark}
+	EasyMark is an online platform to connect students and teachers and share information about grades and assignments.
+
+	\section{Technology Used}
+	Just like Automark, EasyMark is implemented in Java which means the basic development tools are the same. This includes \ref{subsec:java}~Java, \ref{subsec:gradle}~Gradle and \ref{subsec:intellijidea}~IntelliJ~IDEA.
+
+	\subsection{GSON}
+	EasyMark stores its database in a JSON file, hence why it uses Google's GSON library. For more information about GSON and why it was chosen see \ref{subsubsec:gson}~GSON.
+
+	\subsection{Javalin}
+	Javalin is \emph{A simple web framework for Java and Kotlin}\parencite{javalinwebsite}. The majority of EasyMark's code consists of Javalin web resources. Javalin was chosen after several bad experiences with Spark in Automark (such as obscure rules for ordering declarations, hard-to-predict security features and having everything global by design). While Spark is still fine for the local use case in Automark, EasyMark is an internet-connected publicly accessible server, hence why a better framework was needed. Javalin and Spark also share a common ancestry with Javalin initially being a fork of Spark, however it later transitioned into a full rewrite.
+
+	\subsection{Pebble}
+	Pebble is a templating engine inspired by the Twig templating language\parencite{pebblewebsite}. It was chosen because it appeared to offer an above-average combination of usability and maintainance by the developers. Additionally, the author was already familiar with Twig from an earlier internship so less time had to be spent learning Pebble compared to other templating languages.
+
+	\subsection{Spring Security}
+	Spring Security is used for cryptographic functionality in EasyMark. This includes hashing of access tokens and symmetric encryption of sensitive information using up-to-date (and continuously updated) implementations of cryptographic algorithms\parencite{springsecuritywebsite}.
+
+	\pagebreak
+	Java provides cryptographic functionality in most JDK/JRE (Java Development Kit/Java Runtime Environment) distributions. However, the main concern with Java's builtin cryptography was that it is much less simplified than Spring Security's APIs, which in the case of cryptography, can lead to security issues by misuse of cryptographic mechanisms\parencite{javacryptographyusesinthewild}.
+
+	Spring Security is used without the Spring web framework.
+
+	\subsection{Hosted Instance}
+	The hosted instance uses some additional technology to provide its services.
+
+	\subsubsection{Google Compute Engine} \label{subsubsec:googlecomputeengine}
+	Google Compute Engine (GCE) is the virtual machine product on the Google Cloud Platform (GCP)\parencite{gcewebsite}. It is used to host the production instance of EasyMark and was chosen because it provides a free tier which was estimated to be able to satisfy EasyMark's requirements.
+
+	\subsubsection{Debian} \label{subsubsec:debian}
+	Debian is a Linux-based operating system\parencite{aboutdebian} provided by default by the GCE. It was chosen because of its popularity, quality and support as well as the author's familiarity with it. The specific version used is Debian Buster (10).
+
+	\subsubsection{Caddy} \label{subsubsec:caddy}
+	\emph{Caddy 2 is a powerful, enterprise-ready, open source web server with automatic HTTPS written in Go}\parencite{caddywebsite}. It is used as a reverse proxy on the EasyMark instance and was chosen because of its simplicity of use and configuration as well as the author's familiarity with it.
+
+	\section{Functionality}
+	EasyMark provides an environment for teachers (referred to as "admins" by EasyMark) to create one or more courses and register student profiles for (referred to as "participants" by EasyMark).
+
+	Participants are always bound to one course. If a student participates in two courses there will be two participants in the database. The participant's name (which is the only directly personally identifiable information in the system) is encrypted with the access token of the admin who created it. This means the participant isn't able to see their own name on the site but it also means bad actors that were able to obtain information from the database will not be able to see the names either.
+
+	A course can have assignments divided into chapters. Chapters can optionally contain a special "test" assignment to which participants can volunteer after completing the assignments in the chapter (which by EasyMark is referred to as "sending a test request" or "requesting a test").
+
+	\pagebreak
+	Admins have a built-in editor for managing participants' grades. The editor is built like a spreadsheet and enables admins to enter the score reached by a participant for any assignment. Assignments are created with a maximum score although the teacher is able to give a higher score than the maximum if that is nedded.
+
+	\subsection{Zones}
+	Pages on the EasyMark site are divided into "zones" i.e. areas that are only accessible to users with certain roles. There are three zones in EasyMark: The \textbf{public} zone which includes the login page as well as static assets such as CSS and JavaScript scripts, the \textbf{participant} zone which includes the public zone, a view of the participant's progress in their course and the ability to send test requests and the \textbf{admin} zone which includes the public zone, the admin dashboard with the ability to create courses and delete test request, the course editor with the ability to create, delete and edit courses, chapters and assignments and the grading editor with the abilty to create and delete participants and edit participants' scores. Lastly the settings pages is also part of the admin zone with the ability to create and delete other admins, reset their access token and backup and restore information that would be encrypted on the server in unencrypted form.
+
+	\subsection{Access Tokens} \label{subsec:accesstokens}
+	Access tokens (sometimes shortened to "AT") are 48-character long hexadecimal strings. That means they can only consist of the numbers zero to nine and the caracters "a" to "f". Access tokens are generated by the server and randomized.
+
+	The reason for using access tokens instead of a classic username/password authentication scheme was that usernames were an unnecessary complication and possible data protection liability if they were derived from personally identifiable information such as the name and user-chosen passwords would be less secure than randomized ones on average. Technically, access token authentication as employed by EasyMark boils down to username/password authentication but with fully randomized usernames and passwords.
+
+	Since users do not have anything like a username, the first eight characters of an access token are stored in clear in the database and used for identification of the user. The reason for this is that the hash function used to process the password for verification is intentionally slow so that it takes bad actors who have obtained password hashes from the database  longer to brute force them. Therefore it would not be feasible, even with only a few users, to identifiy users by hashing the provided access token again and again and comparing it to the hash in the database.
+
+	Hashing the password once and comparing it multiple times is not easily possible since Spring Security automatically appends random characters (called a "salt") before hashing text which it then stores alongside the hash. This is normally a security measure for user-chosen passwords to prevent so-called "rainbow table attacks" where a bad actor pre-hashes common passwords and compares only the hashes as well as well as having similar hashes for similar passwords in the database. For EasyMark it would theoretically not be necessary to salt access tokens since access tokens are always long randomized strings but due to security considerations it has been decided that it is better for the project to use Spring Security as-is and not try to circumvent it.
+
+	Access tokens are only displayed once on the admin's screen who created the user. The admin is asked to copy or share the access token immediately since it will never be displayed again. The server at that point does not have access to the raw access token anymore.
+
+	Access tokens of participants are referred to as "course access tokens" or "CATs" for short throughout the EasyMark UI and code to differentiate them from admin access tokens. Technically there is no difference between a CAT and an admin AT.
+
+	\subsection{Sessions}
+	Sessions are the association of multiple page views and data such as authorization roles with one another based on authentication. Sessions typically start with a login and end with a logout and are tied to one browser and device. Sessions are necessary to implement zones and users.
+
+	To implement sessions EasyMark makes use of a feature provided by the Javalin framework which automatically sets a session cookie with a framework-generated session ID in the client (the browser). This cookie is then used to re-identify the session. Javalin provides a map (a key-value data structure) to the application which it can use to store session data. EasyMark, when creating a session, manages sessions itself in a seperate session manager. It only stores a reference to the session in the session manager in Javalin's session map. This reference is a UUID (universally unique identifier).
+
+	When logging in, after verifying the user's access token a session is created and registered and the provided access token is discareded again. It is not used anymore until the next login. This brings the benefit of making sessions revokable over another session. Especially in EasyMark's context this is useful since students or teachers might log in over a stationary computer at school and forget to log out afterwards.
+
+	Sessions expire after five hours of inactivity.
+
+	\subsection{Database}
+	EasyMark uses a JSON file as its database. The reason for this decision was that database access frameworks and libraries available in the Java ecosystem where deemed too complicated to learn and implement in the project's limited time span.
+
+	The model behind the JSON file is designed like a relational database schema: The root object includes lists of entities with UUIDs as primary keys and references to other entities are stored as UUIDs. The only exception to this design are access tokens which are stored as JSON objects with the identifier and secret parts as properties.
+
+	See \RefAppendix{A} for the database schema.
+
+	\section{User Interface}
+	Being an internet-connected multi-user web application EasyMark is mostly used over a web browser. However, for some administrative tasks EasyMark provides a command line interface.
+
+	\subsection{Command-Line Interface}
+	EasyMark provides a command-line interface for creating and deleting admins as well as resetting admins' access tokens. This was implemented as a "last-resort" option if, for example, all admins have forgotten their access tokens. For that case it was chosen access to the server counts as a proof of authenticity for an admin. Classic solutions to this problem like using email as a proof of authenticity would have taken too long to implement and would have posed additional security and data protection problems. Note that access to the command line interface or the server does not grant access to encrypted data.
+
+	Like the Automark CLI, EasyMark's interface is divided into several subcommands. These are the subcommands provided by EasyMark:
+
+	\begin{description}
+		\item[serve] Starts the web server on port 8080
+
+		This is also the default subcommand when no subcommand is specified.
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|easymark [serve [--enable-insecure-debug-mechanisms]]|\\
+		\textbf{Arguments:}\tabto{75pt}The \lstinline|--enable-insecure-debug-mechanisms| flag is only for development, testing or evaluation and \textbf{should not be used in production.} It indicates that the server should drop some security features and, among others, enable a feature by which users can bypass authentication by appending \lstinline[mathescape]!?debugChangeLogin=<admin|participant>! to URLs to gain any role they want. This flag should never be used on a production server or database, not even temporarily. It is only for local use.
+
+		\item[create-admin] Creates a new admin account and outputs its access token
+
+		It is recommended the operator stops the server while executing this command.
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|easymark create-admin|
+
+		\item[reset-admin-token] Regenerates an admin account's access token and outputs the new access token
+
+		It is recommended the operator stops the server while executing this command.
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|easymark reset-admin-token <admin-selector>|\\
+		\textbf{Arguments:}\tabto{75pt}\lstinline|<admin-selector>| is either the ID (a UUID) of the admin to reset the access token of or the name of a course that admin administers
+
+		\item[delete-admin] Deletes an admin account and all associated courses participants, chapters, test requests, assignments and assignment results
+
+		It is recommended the operator stops the server while executing this command.
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|easymark delete-admin <admin-selector>|\\
+		\textbf{Arguments:}\tabto{75pt}\lstinline|<admin-selector>| is either the ID (a UUID) of the admin to delete or the name of a course that admin administers
+
+		\pagebreak
+		\item[debug-seed-database] Truncates the database and fills it with demo data used for debugging, development and testing
+
+		Everything in that dataset is deterministic including UUIDs which means it can be (and is) used for testing.
+
+		\textbf{A database generated by this command should never be used in production. Access tokens in the underlying dataset are public.}
+
+		\textbf{Syntax:}\tabto{75pt}\lstinline|easymark debug-seed-database|
+	\end{description}
+
+	\subsection{GUI}
+	The GUI makes up most of EasyMark's user interface. It is used over the internet in a web browser. Most of the GUI is simple and self-explanatory so not every page on the site is mentioned in this paper.
+
+	\subsubsection{Login Page}
+	A plain white page with a single input field in the center labelled "Access Token".
+
+	\subsubsection{Participant Dashboard}
+	\begin{figure}[H]
+		\includegraphics[width=\textwidth]{easymark_participant_dashboard.png}
+		\vskip0pt
+		\caption{Screenshot of the participant dashboard}
+	\end{figure}
+	The participant dashboard is what participants see when they log in.
+
+	It shows the status of submissions, grades and active sessions with the ability to revoke sessions and request tests.
+
+	\pagebreak
+	\subsubsection{Admin Dashboard}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.95\textwidth]{easymark_admin_dashboard.png}
+	\end{figure}
+
+	The admin dashboard is what admins see when they log in.
+
+	It lists courses and links to the course editor, lets the admin create and delete courses and test requests from the top two panels.
+
+	At the bottom there are panels to monitor account activity and sessions and revoke sessions remotely. This is the same session manager component as on the participant dashboard.
+
+	\subsubsection{Course Editor}
+	The course editor is used to edit the structure of a course. That includes creating, editing and deletign chapters and assignments, editing and deleting the course itself.
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width={.95\textwidth}]{easymark_course_editor.png}
+	\end{figure}
+
+	\subsubsection{Grading Editor}
+	The grading editor is used to enter participants' scores on completed assignments as well as add, edit and delete participants.
+
+	It is used and structured like a spreadsheet with participant names as the row keys and assignment names grouped by chapters used as column keys. there are also a few special columns before the assignment columns to reset a participant's course access token, record additional administrative data not shown to the participant and see participants' grades.
+
+	\begin{figure}[h]
+		\includegraphics[width=\textwidth]{easymark_grading_editor.png}
+		\vskip0pt
+		\caption{Screenshot of the grading editor with the debug dataset}
+	\end{figure}
+
+	When scrolling, the name column is fixed to the left. The table header with the column keys and group names is fixed to the top. The topmost and bottommost toolbars are fixed in-place entirely.
+
+	\subsubsection{Settings Page}
+	\begin{wrapfigure}[13]{l}{.55\textwidth}
+		\vskip-15pt
+		\includegraphics[width=.55\textwidth,trim=0 1cm 0 0,clip]{easymark_settings.png}
+	\end{wrapfigure}
+
+	The settings page gives admins the ability to export and re-import encrypted data for their account, for backup purposes. This is especially useful when an admin forgets their access token and has to have it reset, since encrypted data associated with that admin on the server is unrecoverable after an AT reset.
+
+	Located below that are controls to create, delete and reset the access tokens of admins. Every admin can reset the access token of or delete not only their own account but also the account of every other admin, so only trusted people should have access to an admin account.
+
+	When resetting the access token of an admin, one can optionally provide the old access token. If provided, the server will use it to decrypt and re-encrypt encrypted data associated with that admin with the new access token so that the data remains accessible.
+
+	\section{Security}
+	This chapter details the security measures taken in EasyMark and gives reasoning for decisions and considerations on security measures.
+
+	\subsection{Access Tokens and Access Token Verification}
+	As mentioned in \ref{subsec:accesstokens}~Access~Tokens, access tokens are 48 character long random hexadecimal strings, eight of which are stored in clear in the database and used for finding the user (admin or participant) account the client claims to be. The remaining 40 characters are used to verify that the client is authorized to access the account (i.e. as a password).
+
+	Access tokens are only ever generated by the server and are only displayed once in the UI. The secret part (the last 40 characters) of an access token is run through a cryptographic hash function before being stored in the database. The specific hash function used is bcrypt implemented by Spring Security as the \lstinline|BCryptPasswordEncoder|.
+
+	When a user logs in, EasyMark first finds the appropriate account via the identifier part (the first 8 characters) of the access token provided. Then, if it has found one, it hands the secret part (the last 40 characters) of the access token and the hash from the database to Spring Security which verifies that the provided string matches the hash (including any security measures added on top internally such as salting).
+
+	\subsection{Personally Identifiable Information}
+	Data that directly identifies the person behind a participant account is classified as personally identifiable information (PII) and symmetrically encrypted using an encryption mechanism that makes it ultimately accessible using the access token (all 48 characters) of the admin that owns the course the participant is registered in. This also means that the participant is not able to view their own PII. To comply with regulations admins might have to disclose this information to participant account holders on request.
+
+	Currently, only the participants' names are classified as PII. Other PII commonly stored by online platforms such as email addresses are not collected by EasyMark.
+
+	The information is not directly encrypted with the admin's access token. This would mean that the access token must be stored in clear somewhere where it is associated with the session. On the server this would be undesirable since it might entail security disbenefits to handle access tokens in cleartext over extended periods of time. On the client this would be undesirable since it would make sessions un-revokable in practice if the access token is just visible in one of the browser's storage mechanisms.
+
+	Instead, upon registration of an admin a seperate encryption key is generated called the "user encryption key" (UEK). This is the key used to symmetrically encrypt sensitive information. The key is then encrypted with the access token of the new admin (which the server has because it has just been generated). The UEK encrypted with the access token forms the so-called "initial encryption key" (IEK) for the new admin. The IEK is stored in the database next to the access token identifier and hashed secret part. The UEK and raw access token are discarded and handled by Java's garbage collection.
+
+	When an admin now logs in, their supplied access token is used to decrypt the IEK from the database (after all other login checks) to obtain the UEK. Then, another enryption key is generated called the "session encryption token" (SET). The SET is used to encrypt the UEK, which forms the so-called "session encryption key" (SEK). The SEK is stored in the admin's session in the session manager, the SET is sent to the client to be stored as a session cookie (alongside the session ID cookie).
+
+	When an admin performs a request for which the server needs to decrypt sensitive information, the server takes the SET (which it has because the client sent it as a cookie with the request) and the SEK (from the session store) and decrypt the SEK to obtain the UEK. It can then decrypt sensitive data from the database with the UEK and send it to the client. the SET and the UEK are thrown away after the request and handled by Java's garbage collection.
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=.7\textwidth]{easymark_encryption.png}
+		\vskip0pt
+		\caption{Diagram showing the different components of EasyMark's encryption}
+	\end{figure}
+
+	This scheme has the benefit of allowing sessions to be revoked. If the server wants to revoke a session (either after a timeout or on the admin's behalf) it simply throws away the SEK together with the session in the session manager. The client might still have the SET but the SET alone is useless.
+
+	The server can also not decrypt information entirely on its own since it needs a request from the client with the SET first. Although if bad actors are able to hijack the server and intercept requests or view the server process's memory, they are able to decrypt sensitive information.
+
+	End-to-end encryption would prevent that but end-to-end encryption poses challenges for revokability. A seperate "encryption token" could be used only for admins similarly to the access token but it is only used for encryption and never sent to the server. The drawback of this approach would be that the key can't be taken away from clients that are not in control of the admin (like a stationary school computer). That means that a bad actor who has access to such a client and the database contents could decrypt sensitive information. It should be noted that both this scenario and the scenario of bad actors hijacking or replacing the server's process were deemed unlikely.
+
+	The encryption algorithm used for sensitive data (PII) is 256 bit AES in the Galois/Counter Mode of operation. It is implemented in Spring Security via the "delux" encryptor\parencite{springdocssecurityencryptors}.
+
+	\subsection{CSRF Protection} \label{subsec:csrfprotection}
+	\BlockCite{
+		Cross-Site Request Forgery (CSRF) is a type of attack that occurs when a malicious web site, email, blog, instant message, or program causes a user's web browser to perform an unwanted action on a trusted site when the user is authenticated.
+
+		A CSRF attack works because browser requests automatically include all cookies including session cookies. Therefore, if the user is authenticated to the site, the site cannot distinguish between legitimate requests and forged requests.
+	}{owaspcsrfcheatsheet}
+
+	EasyMark's underlying web framework, Javalin, does not provide out-of-the-box CSRF mitigation. Therefore, EasyMark implements the synchronizer token pattern. If a page that's about to be sent to a client (regardless of authentication) contains the ability for the user to do something that should be protected against CSRF (generally state-changing form submissions), the server generates a random CSRF token. CSRF tokens are randomized numbers of the Java data type \lstinline|long| converted to a string in decimal notation. CSRF tokens are stored in Javalin's session map. If they were stored in EasyMark's session manager it would be impossible to protect the login page since EasyMark only registers sessions for authenticated users in the session manager.
+
+	If a request for a CSRF-protected route comes in EasyMark compares the provided CSRF token to the tokens associated with the current session in the session map. If one matches, EasyMark continues with the request and invalidates the token. If not, the request is denied.
+
+	Multiple CSRF tokens can be valid at the same time to allow the user to have multiple tabs with protected actions open at the same time.
+
+	CSRF tokens expire after 5 hours, regardless of session activity.
+
+	Pages with CSRF tokens on them will also explicitly ask the browser not to be cached so that the functionality of history navigation (back/forward buttons) is not broken.
+
+	\subsection{Caching}
+	To prevent leakage of sensitive data some pages (like the pages that display access tokens after account creation) send the "Cache-Control" header with the value "no-store" to ask the browser not to cache them. Caching pages with sensitive information would risk showing that information to unauthorized parties which especially is a problem in EasyMark's case since EasyMark might be used from public computers (like stationary school computers).
+
+	Pages with CSRF tokens on them also disable caching. See \ref{subsec:csrfprotection}~CSRF~Protection.
+
+	\section{Deployment}
+	Being a web application with a backend, EasyMark requires a host to run on. Additionally Easymark requires some extra infrastructure such as a reverse proxy in production environments. To accomplish this, a small framework has been written to automatically configure a virtual machine on the Google Compute Engine. The GCE-specific parts of the framework are small so it could also be ported to different environments. It is somewhat dependent on Debian as the host operating system although that can also be changed if needed.
+
+	The framework is written in Bash and allows operators to write simple configuration scripts (called "modules") similarly to how they would manually perform the steps from a shell.
+
+	The whole framework is designed around idempotency (regardless of how often the program is run, the result is the same) and avoiding work that does not need to be done to speed up execution. Modules are expected to follow this design as well.
+
+	The framework expects the presence of a user called "admin" with the group "admin". It must be run either by this user or root.
+
+	\subsection{Packlists}
+	The configuration program deterministically manages packages installed on the host. That means it provides a file where operators can specify a list of packages to be installed. This list is in a purpose-built file format called "packlist". Packlists are simple newline-seperated lists of package names from the apt repositories installed on the server. Full lines can act as comments if the line starts with a \lstinline|#| (hash sign).
+
+	Packlists can either be used to specify packages that should be installed if named "autoinstall" or "\$hostname.autoinstall" (where \$hostname is the host's hostname) or to specify packages that might be present on the system but should be ignored by the mechanism if named "ignore", "\$hostname.ignore" or "gce-buster-default.ignore". "gce-buster-default.ignore" is reserved for packages that come pre-installed on a Debian Buster installation on the GCE and should be updated if needed on a new installation before anything else is done.
+
+	\pagebreak
+	Packages that are installed but not documented are not removed but when using the "lspack" utility provided by the framework the operator can see which packages are installed but untracked.
+
+	\subsection{Command-Line Interface}
+	Two utilities are provided: \textbf{install} and \textbf{lspack}.
+
+	\subsubsection{install}
+	\lstinline|install| performs the actual configuration steps by running modules which includes installing packages among other things.
+
+	The program can be run either as the admin user or root (\lstinline|sudo ./install| if logged in as the admin user). If run as root, it completes the full configuration. If run as admin it does not have the privileges to run some modules so it can only configure the system partially.
+
+	\subsubsection{lspack}
+	\lstinline|lspack| compares the packages installed on the system to the packages in the packlist files and outputs the differences it provides two subcommands.
+
+	\begin{description}
+		\item[untracked] Lists the packages installed on the system but not tracked in either the "autoinstall" files or the "ignore" files
+		\item[non-installed] Lists the packages not installed on the system but tracked by the "autoinstall" files; These will be installed if \lstinline|install| is run as root
+	\end{description}
+
+	\subsection{Infrastructure}
+	The config program sets up some infrastructure for EasyMark. This is mostly done in modules. Some infrastructure is also set up manually.
+
+	\subsubsection{Automatic Updates}
+	The host automatically updates its packages once per day. This feature is provided by apt and enabled in a module.
+
+	\subsubsection{Caddy}
+	See \ref{subsubsec:caddy}~Caddy. Caddy is used as a reverse proxy since it is expected to be more resilient against malformed inputs than the HTTP server in EasyMark (which is based on Javalin, which is in turn based on Jetty). Caddy also offers automatic HTTPS by obtaining and automatically renewing TLS certificates from the Let's Encrypt certificate authority.
+
+	Caddy is also configured with automatic daily updates. This is handled seperately from the other daily updates since Caddy is not installed from an apt repository.
+
+	\subsubsection{Helpers for Interactive Use}
+	Some programs have also been configured for interactive use (i.e. when logging into the server over SSH). This includes Git and the "micro" editor.
+
+	\Appendix{
+		\vskip-3.5cm
+		\hspace{1cm}
+		\includegraphics[angle=90,height=.85\paperheight]{easymark_data_model.png}
+	}
 \end{document}
