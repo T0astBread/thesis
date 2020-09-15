@@ -178,30 +178,31 @@
 	\pagenumbering{gobble}
 	\IfPrivateBuild{
 		\includegraphics[width=\textwidth]{school-header.png}
-		\centering
-		\vskip1cm
-		Fachrichtung Informatik
-		\vskip2cm
-		Schuljahr 2019/20
-		\vskip4cm
-		\Huge\textbf{DIPLOMARBEIT}
-		\vskip10pt
-		\large
-		Gesamtprojekt
-		\vskip5pt
-		\Huge\textbf{Easy Mark One}
-		\small
-		\vskip4cm
-		\begin{flushleft}
-			\textbf{Ausgeführt von:}\tabto{10cm}\textbf{Betreuer/Beteuerin:}\linebreak
-			\EmRealAuthorName, \EmAuthorClass-\EmAuthorNumber
-			\vskip2cm
-			\EmPhysicalLocation, am \today
+		{\centering
 			\vskip1cm
-			\hrule
-			Abgabevermerk:\linebreak
-			Datum:\tabto{10cm}Betreuer/Beteuerin:
-		\end{flushleft}
+			Fachrichtung Informatik
+			\vskip2cm
+			Schuljahr 2019/20
+			\vskip4cm
+			\Huge\textbf{DIPLOMARBEIT}
+			\vskip10pt
+			\large
+			Gesamtprojekt
+			\vskip5pt
+			\Huge\textbf{Easy Mark One}
+			\small
+			\vskip4cm
+			\begin{flushleft}
+				\textbf{Ausgeführt von:}\tabto{10cm}\textbf{Betreuer/Beteuerin:}\linebreak
+				\EmRealAuthorName, \EmAuthorClass-\EmAuthorNumber
+				\vskip2cm
+				\EmPhysicalLocation, am \today
+				\vskip1cm
+				\hrule
+				Abgabevermerk:\linebreak
+				Datum:\tabto{10cm}Betreuer/Beteuerin:
+			\end{flushleft}
+		}
 	}{
 		\maketitle
 		\pagebreak
