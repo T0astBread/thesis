@@ -176,7 +176,36 @@
 
 \begin{document}
 	\pagenumbering{gobble}
-	\maketitle
+	\IfPrivateBuild{
+		\includegraphics[width=\textwidth]{school-header.png}
+		\centering
+		\vskip1cm
+		Fachrichtung Informatik
+		\vskip2cm
+		Schuljahr 2019/20
+		\vskip4cm
+		\Huge\textbf{DIPLOMARBEIT}
+		\vskip10pt
+		\large
+		Gesamtprojekt
+		\vskip5pt
+		\Huge\textbf{Easy Mark One}
+		\small
+		\vskip4cm
+		\begin{flushleft}
+			\textbf{Ausgeführt von:}\tabto{10cm}\textbf{Betreuer/Beteuerin:}\linebreak
+			\EmRealAuthorName, \EmAuthorClass-\EmAuthorNumber
+			\vskip2cm
+			\EmPhysicalLocation, am \today
+			\vskip1cm
+			\hrule
+			Abgabevermerk:\linebreak
+			Datum:\tabto{10cm}Betreuer/Beteuerin:
+		\end{flushleft}
+	}{
+		\maketitle
+		\pagebreak
+	}
 	\IfPrivateBuild{
 		\chapter*{Erklärung gemäß Prüfungsordnung}
 		„Ich erkläre an Eides statt, dass ich die vorliegende Diplomarbeit selbstständig und ohne fremde Hilfe verfasst, andere als die angegebenen Quellen und Hilfsmittel nicht benutzt und alle den benutzten Quellen wörtlich oder sinngemäß entnommenen Stellen als solche kenntlich gemacht habe.“
