@@ -1,0 +1,5 @@
+#!/bin/sh
+cd thesis-paper
+./build
+cd ../easymark-devguide
+./build
