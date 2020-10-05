@@ -321,7 +321,7 @@
 	For safety, permissions on the database file should be limited. It only needs to be readable and writable by the \lstinline|easymark| user so if you have created a new database, it is advised to run
 	
 	\begin{lstlisting}[language=bash]
-		sudo chmod u=rw,og= database.json
+		sudo chmod u=rw,g=r,o= database.json
 	\end{lstlisting}
 
 	\chapter{Configuration Framework}
