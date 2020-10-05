@@ -350,7 +350,13 @@
 	\subsection{GCP Prerequisites}
 	You will need a virtual machine on the GCE with Debian Buster and an SSH key. The free \lstinline|f1-micro| type is sufficient.
 	
+	When setting up the VM, tick the "Allow HTTP traffic" and "Allow HTTPS traffic" checkboxes. In the "Management, security, disks, networking, sole tenancy" dropdown, enable Secure Boot in the "Security" tab. If you are migrating from an existing machine and you already have a static IP address on the Google Cloud, you can re-use it by selecting in "Networking > External IP".
+	
+	When you create the VM but you already have a service account for the server (see the next paragraph), you can use that service account instead of the default GCE service account by selecting in in the "Identity and API access > Service account" dropdown.
+	
 	Additionally a Cloud Storage bucket and a service account for the machine are required. It is recommended to create a new service account for that instead of using the default service account for GCE machines. It is recommended to disable the default GCE account.
+	
+	It is recommended to set up a retention policy and lifecycle management for the Cloud Storage bucket. A good minimum retention time is 85000 seconds (slightly less than 24 hours) since it will not conflict with the recommended lifecycle rules. For lifecycle rules it is recommended to delete nearline-class storage items 31 days after creation and to delete standard-class storage items one day after creation.
 	
 	\subsection{Other Prerequisites}
 	To send regular Logwatch reports, the machine requires SMTP access. SMTP access is provided via login credentials and will be set up by the configuration framework.
@@ -362,6 +368,7 @@
 	
 	The \lstinline|.env| file is a Bash script hence why it needs a Bash hashbang (typically \lstinline|#!/bin/bash| at the start of the file). It must contain the following values:
 	
+	\pagebreak
 	\begin{lstlisting}[language=bash]
 		#!/bin/bash
 		TIMEZONE=<timezone of the server; e.g.: Europe/Vienna>
@@ -401,6 +408,7 @@
 			\item \lstinline|sudo cp ~/.ssh/authorized_keys /home/admin/.ssh|
 			\item \lstinline|sudo chown --recursive admin:admin /home/admin/.ssh|
 		\end{itemize}
+		\pagebreak
 		\item At this point, try logging in as the admin user over SSH. It should work. If it does not, check if you have made a mistake. If you have not made a mistake and it does not work something is not right.
 		
 		Also try running a command via \lstinline|sudo| (e.g. \lstinline|sudo cat /etc/shadow|). It should work as well.
@@ -414,7 +422,6 @@
 	
 	Place a copy of the \lstinline|.env| file from above in the \lstinline|config| folder.
 	
-	\pagebreak
 	Build the EasyMark server program (by running the Gradle \lstinline|build| task in the EasyMark project). There should be a file named \lstinline|easymark-<version>.tar| in a folder called \lstinline|build/distributions|. Rename this file to \lstinline|easymark.tar| and upload it to the server. Place it in the \lstinline|config| folder. Repeat this procedure when deploying new versions of EasyMark.
 	
 	Now you should be ready to run the configuration framework.
