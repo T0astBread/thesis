@@ -153,14 +153,14 @@
 	\pagenumbering{arabic}
 	\chapter{Overview}
 	EasyMark, in the broadest sense, is composed of two main parts: \textbf{The actual server} program which implements the application HTTP server and the \textbf{host configuration framework} which configures a VM on the Google Cloud Platform with some lightweight production-ready infrastructure for EasyMark. It is implemented in Bash.
-	
+
 	The EasyMark server is implemented in Java as one single Gradle project. It is built using the Gradle application plugin and (when using the config framework) deployed from the generated distribution tarball in \lstinline|build/distributions|. It provides an HTTP server for the EasyMark application which doesn't implement important security features like HTTPS so it is designed to be run behind a reverse proxy. EasyMark does not need a separate database server.
-	
+
 	\chapter{Server}
 	This chapter describes the EasyMark application server implemented in Java.
-	
+
 	The server is built upon the \href{https://javalin.io/}{Javalin} web framework which is conceptually similar to modern web frameworks like \href{https://expressjs.com/}{Express for Node.js}. For cryptographic functionality like password (access token) hashing and symmetric encryption of sensitive data Spring Security is used. Consult the author's thesis paper on this project for more information.
-	
+
 	\section{Class Structure}
 	\newcounter{codetreeitemidx}
 	\newcommand{\EmCodeTree}[4]{
@@ -254,9 +254,9 @@
 	\pagebreak
 	\section{Database}
 	The EasyMark server uses a JSON file as a database that is represented by a corresponding data model in-memory and serialized by GSON. The database model object is global within the server program and is guarded by a read/write lock. This was added to open the possibility for multithreading, however, other parts of the server are not threadsafe.
-	
+
 	It can be accessed using \lstinline|DBMS.openRead()| or \lstinline|DBMS.openWrite()| from the \linebreak\lstinline|easymark.database.DBMS| class. Both methods return a \lstinline|DatabaseHandle| object, on which one can call the \lstinline|get()| method to obtain the database model itself. If \lstinline|DBMS.openWrite()| was used to obtain the handle, it is safe to modify the model. After the model is no longer needed, the \lstinline|DatabaseHandle| must be closed by calling the \lstinline|close()| method. It is recommended to do this using a try-with-resources block in Java.
-	
+
 	\begin{lstlisting}[language=Java]
 		try(DatabaseHandle db = DBMS.openRead()) {
 			Course myCourse = db.get()
@@ -267,14 +267,14 @@
 	\end{lstlisting}
 
 	The database is not automatically written to disk after a change. The \lstinline|DBMS.store()| method can be used to save the current state of the database. This should be done while holding an open writing handle.
-	
+
 	The \lstinline|DBMS.load()| method can be used to load the database from disk, discarding the current in-memory version. It should also only be used with an open writing handle. After the call, the database obtained by \lstinline|get()| on the \lstinline|DatabaseHandle| is garbage.
-	
+
 	There is also a method called \lstinline|DBMS.replace(Database)| that takes a database model object as its parameter and replaces the current database model with it. One use-case for this method is setting up pristine databases. This method should only be used while holding an open writing handle. After the call, the database obtained by \lstinline|get()| on the \lstinline|DatabaseHandle| is garbage.
-	
+
 	\section{HTTP Route Handling}
 	Javalin provides an expressive syntax for registering HTTP route handlers which is how a lot of EasyMark's pages are registered.
-	
+
 	\begin{lstlisting}[language=Java]
 		app.get("/my/path", ctx -> {
 			// do something...
@@ -283,91 +283,91 @@
 	\end{lstlisting}
 
 	The last argument (\lstinline|roles(UserRole.ADMIN)|) specifies which user roles are authorized to access the declared route. In Javalin this argument is optional and forgetting it constitutes a security issue in most cases. Access control and authentication are implemented using an \lstinline|AccessManager| (a concept from Javalin) in the \lstinline|easymark.webserver.|\linebreak\lstinline|WebServer| class.
-	
+
 	To avoid inconsistencies there exists a helper class called \lstinline|CommonRouteBuilder| that follows the builder pattern and lets users register commonly used routes in the EasyMark server for a type of resource. These routes try to follow RESTful principles.
-	
+
 	HTTP routes are grouped by their resource types and split into separate classes in the \lstinline|easymark.webserver.routes| package. These classes typically have a public static \lstinline|configure(...)| method which takes the current instances of the Javalin server and the EasyMark \lstinline|SessionManager| as its parameters.
-	
+
 	\section{Sessions}
 	Inside a route handler, the current user's session (in the EasyMark \lstinline|SessionManager|) can be obtained (if the user is logged in) with a helper from the \lstinline|easymark.webserver.|\linebreak\lstinline|WebServerUtils| class. The method is called \lstinline|getSession(SessionManager,|\linebreak\lstinline|Context)|, takes the EasyMark \lstinline|SessionManager| and the Javalin request context as its parameters and returns the current user's \lstinline|easymark.webserver.sessions.Session|.
-	
+
 	If an exception occurs during retrieval of the session, the helper method will automatically answer the request with a corresponding error.
-	
+
 	\section{CSRF Protection}
 	To protect a route against CSRF, developers must add a hidden CSRF input to any form that sends a POST request to the route. This can be done using the\linebreak\lstinline|makeCSRFToken(Context)| helper method from the \lstinline|WebServerUtils| class and the \lstinline|partials/csrf-input.peb| template.
-	
+
 	In the handler of the protected route the token must be checked. \lstinline|WebServerUtils| contains a helper for this called \lstinline|checkCSRFToken(Context, String)| where the first argument is the HTTP request context and the second argument is the provided CSRF token. For CSRF tokens that are submitted as form values with the default \lstinline|csrfToken| name there is also another helper called \lstinline|checkCSRFFormSubmission(Context)| which eliminates some more boilerplate code.
-	
+
 	\section{Templates and Keys}
 	Most HTTP responses are in the form of a template rendering. The templating engine used is Pebble. Templates are located under \lstinline|resources| where page templates are strictly in the \lstinline|pages| folder and templates designed to be included by other templates are in the \lstinline|partials| folder.
-	
+
 	Page template file names follow a loose naming convention of the HTTP resource path with slashes (\lstinline|/|) replaced by underscores (\lstinline|_|) followed by a dot followed by the user role(s) (separated by underscores) allowed to access the page (if the page has different templates for different user roles) followed by \lstinline|.peb|.
-	
+
 	Page templates are rendered using \lstinline|ctx.render(...)| provided by the Javalin framework and take parameters in the form of a key-value map. The keys are written as public static constants in the \lstinline|easymark.webserver.constants.ModelKeys| class. In the template they have to be hardcoded since Pebble templates can't access static Java constants.
-	
+
 	Some other functions of the server are solved in a similar way: \lstinline|FormKeys| contains names of form inputs in templates, \lstinline|CookieKeys| contains names of cookies in the browser, \lstinline|PathParams| and \lstinline|QueryKeys| contain names of request parameters in the path- and query sections of the HTTP request, respectively.
 
 	\lstinline|SessionKeys| contains keys for values in Javalin's session map. This map is distinct from the \lstinline|SessionManager| of EasyMark and is used to store session data that has to be present for users that are not logged in (such as CSRF tokens) as well as the association of Javalin's session with a \lstinline|Session| object in the \lstinline|SessionManager|, if any.
-	
+
 	\section{Command-Line Interface}
 	Consult the author's thesis paper on EasyMark for a documentation of the command-line interface. The command line interface should be used in the directory of the EasyMark database and the server should be stopped first. When using the default configuration (from the configuration framework), use \lstinline|sudo| to elevate your privileges to be able to access the database.
-	
+
 	Make sure the \lstinline|database.json| file is accessible to the \lstinline|easymark| user after you have completed your operations. This is usually not a problem unless you have just created a new database. In that case, simply run:
-	
+
 	\begin{lstlisting}[language=bash]
 		sudo chown easymark:easymark database.json
 	\end{lstlisting}
-	
+
 	For safety, permissions on the database file should be limited. It only needs to be readable and writable by the \lstinline|easymark| user so if you have created a new database, it is advised to run
-	
+
 	\begin{lstlisting}[language=bash]
 		sudo chmod u=rw,g=r,o= database.json
 	\end{lstlisting}
 
 	\chapter{Configuration Framework}
 	The configuration framework is designed to set up a small production-ready deployment of the EasyMark server on a virtual machine on the Google Compute Engine (GCE). It is built to be idempotent, meaning that it yields the same results no matter how often it is run. Additionally, it avoids work that does not need to be done meaning that subsequent runs will be faster.
-	
+
 	The configuration framework has two basic operator-facing utilities: \textbf{install} and \textbf{lspack}.
-	
+
 	\section{\lstinline|install|}
 	\lstinline|install| is the main entry point to run the configuration framework. If all prerequisites for the installation are met, the framework will automatically perform all the necessary actions to configure the machine.
-	
+
 	This script should be run as root using \lstinline|sudo ./install|. It will still perform tasks that do not require root privileges when run as the \lstinline|admin| user, however, this might fail since the non-root sections might depend on the root section.
-	
+
 	\section{\lstinline|lspack| and Packlists}
 	The configuration framework uses simple lists (called "packlists") to track packages that should be present on the server. \lstinline|lspack| can be used to to list packages that should be present but are missing (via \lstinline|./lspack non-installed|) or packages that are present but aren't documented in either one of the \lstinline|autoinstall| or the \lstinline|ignore| lists (via \lstinline|./lspack untracked|).
-	
+
 	To install new software an operator can simply add the name of the APT package to the \lstinline|packages/autoinstall| list. (APT packages can be searched for using \lstinline|apt search|.) This includes packages from all installed APT sources. If new sources are installed, the code for that should be placed before the \lstinline|autoinstall| module in the install script.
-	
+
 	For packages that already come pre-installed on a GCE VM (so they should be seen as installed by the script but not be installed should they be missing for some reason) there exists an \lstinline|ignore| list. When setting up a new machine this list should be updated if needed using \lstinline|lspack| to check for new pre-installed packages.
-	
+
 	Packlists can contain comments. If a line starts with a hash sign (\lstinline|#|) it is seen as a comment. In-line comments do not exist.
-	
+
 	\pagebreak
 	\section{Setup Guide}
 	This section aims to give a straightforward guide to set up a full production-ready server on a fresh GCE VM including all pre-requisites.
-	
+
 	\subsection{GCP Prerequisites}
 	You will need a virtual machine on the GCE with Debian Buster and an SSH key. The free \lstinline|f1-micro| type is sufficient.
-	
+
 	When setting up the VM, tick the "Allow HTTP traffic" and "Allow HTTPS traffic" checkboxes. In the "Management, security, disks, networking, sole tenancy" dropdown, enable Secure Boot in the "Security" tab. If you are migrating from an existing machine and you already have a static IP address on the Google Cloud, you can re-use it by selecting in "Networking > External IP".
-	
+
 	When you create the VM but you already have a service account for the server (see the next paragraph), you can use that service account instead of the default GCE service account by selecting in in the "Identity and API access > Service account" dropdown.
-	
+
 	Additionally a Cloud Storage bucket and a service account for the machine are required. It is recommended to create a new service account for that instead of using the default service account for GCE machines. It is recommended to disable the default GCE account.
-	
+
 	It is recommended to set up a retention policy and lifecycle management for the Cloud Storage bucket. A good minimum retention time is 85000 seconds (slightly less than 24 hours) since it will not conflict with the recommended lifecycle rules. For lifecycle rules it is recommended to delete nearline-class storage items 31 days after creation and to delete standard-class storage items one day after creation.
-	
+
 	\subsection{Other Prerequisites}
 	To send regular Logwatch reports, the machine requires SMTP access. SMTP access is provided via login credentials and will be set up by the configuration framework.
-	
+
 	The machine also needs a domain with a DNS record set up for it.
-	
+
 	\subsection{\lstinline|.env| File}
 	You will need to prepare a file named \lstinline|.env| with various secret or deployment-specific configuration values. This file should not be published but can be kept alongside copies of the configuration repo (which is how it is stored on the server).
-	
+
 	The \lstinline|.env| file is a Bash script hence why it needs a Bash hashbang (typically \lstinline|#!/bin/bash| at the start of the file). It must contain the following values:
-	
+
 	\pagebreak
 	\begin{lstlisting}[language=bash]
 		#!/bin/bash
@@ -392,7 +392,7 @@
 
 	\subsection{Setup}
 	First (immediately after SSHing into the server), you need to create the \lstinline|admin| user. This would be a bit messy in the framework so it has to be done manually. If the user you start with when you SSH into the server is already called \lstinline|admin| you can skip these steps.
-	
+
 	\begin{enumerate}
 		\item \lstinline|sudo adduser admin| and answer the questions (or hit enter a couple of times)
 		\item Add the \lstinline|admin| user to all groups of your current user, except your current primary group
@@ -410,24 +410,24 @@
 		\end{itemize}
 		\pagebreak
 		\item At this point, try logging in as the admin user over SSH. It should work. If it does not, check if you have made a mistake. If you have not made a mistake and it does not work something is not right.
-		
+
 		Also try running a command via \lstinline|sudo| (e.g. \lstinline|sudo cat /etc/shadow|). It should work as well.
 	\end{enumerate}
 
 	Now the \lstinline|admin| user is set up and you can delete your old user, if you did not start with a user called \lstinline|admin|. To do that, run \lstinline|sudo deluser --remove-home <old username>|.
-	
+
 	Next place a copy of the configuration framework repository in a folder called \lstinline|config| in the \lstinline|admin| user's home directory (so that the file \lstinline|/home/admin/config/install| is the \lstinline|install| script).
-	
+
 	You can do that by installing git (\lstinline|sudo apt update && sudo apt install git|) and cloning the repository (\lstinline|git clone <repo url> config| where \lstinline|<repo url>| is the HTTP URL of the repository on a site like GitHub). Alternatively you can also use another tool to upload the files like the \lstinline|scp| command in a terminal on your computer.
-	
+
 	Place a copy of the \lstinline|.env| file from above in the \lstinline|config| folder.
-	
+
 	Build the EasyMark server program (by running the Gradle \lstinline|build| task in the EasyMark project). There should be a file named \lstinline|easymark-<version>.tar| in a folder called \lstinline|build/distributions|. Rename this file to \lstinline|easymark.tar| and upload it to the server. Place it in the \lstinline|config| folder. Repeat this procedure when deploying new versions of EasyMark.
-	
+
 	Now you should be ready to run the configuration framework.
-	
+
 	\subsection{Running the Framework}
 	To run the full configuration execute \lstinline|sudo ./install| in the \lstinline|config| directory as the admin user. If you don't need to run everything you can also run it without sudo. This is useful when tweaking configuration files for convenience tools for administrators for example.
-	
+
 	Everything should be set up after you have initially run the framework. The server should be accessible from the domain you have assigned to it. If it is not accessible and the domain is new or you had to change the DNS entry it might not have propagated to some caches yet.
 \end{document}
