@@ -1,2 +1,2 @@
 #!/bin/sh
-xelatex -synctex=1 -interaction=nonstopmode devguide.tex
+xelatex -synctex=1 -interaction=nonstopmode easymark-devguide.tex
