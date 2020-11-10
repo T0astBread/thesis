@@ -327,7 +327,7 @@
 	\chapter{Configuration Framework}
 	The configuration framework is designed to set up a small production-ready deployment of the EasyMark server on a virtual machine on the Google Compute Engine (GCE). It is built to be idempotent, meaning that it yields the same results no matter how often it is run. Additionally, it avoids work that does not need to be done meaning that subsequent runs will be faster.
 
-	The configuration framework has two basic operator-facing utilities: \textbf{install} and \textbf{lspack}.
+	The configuration framework has three basic operator-facing utilities: \textbf{install}, \textbf{lspack} and \textbf{restore-from-backup}.
 
 	\section{\lstinline|install|}
 	\lstinline|install| is the main entry point to run the configuration framework. If all prerequisites for the installation are met, the framework will automatically perform all the necessary actions to configure the machine.
@@ -344,6 +344,9 @@
 	Packlists can contain comments. If a line starts with a hash sign (\lstinline|#|) it is seen as a comment. In-line comments do not exist.
 
 	\pagebreak
+	\section{\lstinline|restore-from-backup|}
+	\lstinline|restore-from-backup| is used to restore data (which includes TLS certificates and the EasyMark database) from a Cloud Storage backup to the running server. Before running it the operator has to place the \lstinline|caddy.tar| and \lstinline|database.json| files from the backup into the \lstinline|config/| directory, then run the script as root from there (\lstinline|sudo ./restore-from-backup|). Everything including starting and stopping the necessary services on the machine should be handled automatically by the script.
+
 	\section{Setup Guide}
 	This section aims to give a straightforward guide to set up a full production-ready server on a fresh GCE VM including all pre-requisites.
 
@@ -368,7 +371,6 @@
 
 	The \lstinline|.env| file is a Bash script hence why it needs a Bash hashbang (typically \lstinline|#!/bin/bash| at the start of the file). It must contain the following values:
 
-	\pagebreak
 	\begin{lstlisting}[language=bash]
 		#!/bin/bash
 		TIMEZONE=<timezone of the server; e.g.: Europe/Vienna>
@@ -402,13 +404,13 @@
 			% weird spacing thing in the next line since for some reason, LaTeX wants to remove the space after "<groups>"
 			\item Run \lstinline|sudo usermod -aG "<groups>"|\space\lstinline|admin| where \lstinline|<groups>| is the copied output with commas instead of spaces\\(\lstinline|sudo usermod -aG "adm,dip,video,plugdev,google-sudoers"|\space\lstinline|admin|)
 		\end{itemize}
+		\pagebreak
 		\item Copy your user's \lstinline|~/.ssh/authorized_keys| file to the \lstinline|admin| user's home directory
 		\begin{itemize}
 			\item \lstinline|sudo mkdir -p /home/admin/.ssh|
 			\item \lstinline|sudo cp ~/.ssh/authorized_keys /home/admin/.ssh|
 			\item \lstinline|sudo chown --recursive admin:admin /home/admin/.ssh|
 		\end{itemize}
-		\pagebreak
 		\item At this point, try logging in as the admin user over SSH. It should work. If it does not, check if you have made a mistake. If you have not made a mistake and it does not work something is not right.
 
 		Also try running a command via \lstinline|sudo| (e.g. \lstinline|sudo cat /etc/shadow|). It should work as well.
